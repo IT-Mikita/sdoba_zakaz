@@ -16,48 +16,34 @@
   <script type="text/babel">
     const { useState, useEffect } = React;
 
-    // Mock data with placeholder images
+    // Mock product data with images
     const mockCategories = [
-      { id: 1, name: "Слойки сытные", image: "https://placehold.co/200x200?text=Слойки" },
-      { id: 2, name: "Розаны", image: "https://placehold.co/200x200?text=Розаны" },
-      { id: 3, name: "Штрудели", image: "https://placehold.co/200x200?text=Штрудели" },
+      { id: 1, name: "Слойки сытные", image: "https://images.unsplash.com/photo-1601050690597-df0568f70950?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&h=500&q=80" },
+      { id: 2, name: "Розаны", image: "https://images.unsplash.com/photo-1562440499-64c9a111f713?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&h=500&q=80" },
+      { id: 3, name: "Штрудели", image: "https://images.unsplash.com/photo-1603532648955-039310d9ed75?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&h=500&q=80" },
     ];
 
     const mockProducts = [
-      { id: 1, category_id: 1, name: "Product 1", article: "P001", weight: 100, price_per_unit: 10.00, units_per_pack: 50, price_per_pack: 500.00, storage_period: "12 мес.", technology: "RST", available_units: 20, image: "https://placehold.co/200x200?text=Product+1" },
-      { id: 2, category_id: 1, name: "Product 2", article: "P002", weight: 120, price_per_unit: 12.00, units_per_pack: 50, price_per_pack: 600.00, storage_period: "12 мес.", technology: "RST", available_units: 15, image: "https://placehold.co/200x200?text=Product+2" },
-      { id: 3, category_id: 2, name: "Product 3", article: "P003", weight: 110, price_per_unit: 15.00, units_per_pack: 50, price_per_pack: 750.00, storage_period: "6 мес.", technology: "RST", available_units: 10, image: "https://placehold.co/200x200?text=Product+3" },
-      { id: 4, category_id: 3, name: "Product 4", article: "P004", weight: 150, price_per_unit: 20.00, units_per_pack: 30, price_per_pack: 600.00, storage_period: "12 мес.", technology: "RST", available_units: 5, image: "https://placehold.co/200x200?text=Product+4" },
+      { id: 1, category_id: 1, name: "Слойка с мясом", article: "P001", weight: 100, price_per_unit: 10.00, units_per_pack: 50, price_per_pack: 500.00, storage_period: "12 мес.", technology: "RST", available_units: 20, image: "https://images.unsplash.com/photo-1601050690597-df0568f70950?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&h=500&q=80" },
+      { id: 2, category_id: 1, name: "Слойка с сыром", article: "P002", weight: 120, price_per_unit: 12.00, units_per_pack: 50, price_per_pack: 600.00, storage_period: "12 мес.", technology: "RST", available_units: 15, image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&h=500&q=80" },
+      { id: 3, category_id: 2, name: "Розан с вишней", article: "P003", weight: 110, price_per_unit: 15.00, units_per_pack: 50, price_per_pack: 750.00, storage_period: "6 мес.", technology: "RST", available_units: 10, image: "https://images.unsplash.com/photo-1562440499-64c9a111f713?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&h=500&q=80" },
+      { id: 4, category_id: 3, name: "Штрудель яблочный", article: "P004", weight: 150, price_per_unit: 20.00, units_per_pack: 30, price_per_pack: 600.00, storage_period: "12 мес.", technology: "RST", available_units: 5, image: "https://images.unsplash.com/photo-1603532648955-039310d9ed75?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&h=500&q=80" },
     ];
 
-    // Breadcrumbs Component
-    function Breadcrumbs({ screen, selectedCategory, selectedProduct, setScreen }) {
-      const items = [{ name: "Главная", screen: "main" }];
-      if (screen === "catalog") {
-        items.push({ name: "Каталог", screen: "catalog" });
-      } else if (screen === "products") {
-        items.push({ name: "Каталог", screen: "catalog" }, { name: selectedCategory.name, screen: "products" });
-      } else if (screen === "product_details") {
-        items.push(
-          { name: "Каталог", screen: "catalog" },
-          { name: selectedCategory.name, screen: "products" },
-          { name: selectedProduct.name, screen: "product_details" }
-        );
-      }
-
+    // Breadcrumbs component
+    function Breadcrumbs({ path, onNavigate }) {
       return (
-        <div className="flex flex-wrap items-center p-4 bg-gray-200 text-gray-700 text-sm">
-          {items.map((item, index) => (
-            <span key={item.name} className="flex items-center">
-              {index > 0 && <span className="mx-2">></span>}
-              <button
-                className="hover:underline focus:outline-none"
-                onClick={() => setScreen(item.screen)}
-                disabled={item.screen === screen}
+        <div className="flex items-center text-sm text-gray-600 mb-4 px-4">
+          {path.map((item, index) => (
+            <div key={index} className="flex items-center">
+              {index > 0 && <span className="mx-2">/</span>}
+              <button 
+                onClick={() => onNavigate(item.screen)}
+                className={`${index === path.length - 1 ? 'font-bold text-orange-500' : 'hover:text-orange-400'}`}
               >
                 {item.name}
               </button>
-            </span>
+            </div>
           ))}
         </div>
       );
@@ -69,9 +55,58 @@
       const [selectedCategory, setSelectedCategory] = useState(null);
       const [selectedProduct, setSelectedProduct] = useState(null);
       const [cart, setCart] = useState([]);
-      const [quantity, setQuantity] = useState(1);
       const [checkoutData, setCheckoutData] = useState({ name: "", phone: "", address: "" });
       const [orders, setOrders] = useState([]);
+      const [breadcrumbs, setBreadcrumbs] = useState([{ name: "Главная", screen: "main" }]);
+
+      const updateBreadcrumbs = (newScreen, name) => {
+        let newBreadcrumbs = [...breadcrumbs];
+        
+        if (newScreen === "main") {
+          newBreadcrumbs = [{ name: "Главная", screen: "main" }];
+        } else if (newScreen === "catalog") {
+          newBreadcrumbs = [
+            { name: "Главная", screen: "main" },
+            { name: "Каталог", screen: "catalog" }
+          ];
+        } else if (newScreen === "products") {
+          newBreadcrumbs = [
+            { name: "Главная", screen: "main" },
+            { name: "Каталог", screen: "catalog" },
+            { name: selectedCategory.name, screen: "products" }
+          ];
+        } else if (newScreen === "product_details") {
+          newBreadcrumbs = [
+            { name: "Главная", screen: "main" },
+            { name: "Каталог", screen: "catalog" },
+            { name: selectedCategory.name, screen: "products" },
+            { name: selectedProduct.name, screen: "product_details" }
+          ];
+        } else if (newScreen === "cart") {
+          newBreadcrumbs = [
+            { name: "Главная", screen: "main" },
+            { name: "Корзина", screen: "cart" }
+          ];
+        } else if (newScreen === "checkout") {
+          newBreadcrumbs = [
+            { name: "Главная", screen: "main" },
+            { name: "Корзина", screen: "cart" },
+            { name: "Оформление", screen: "checkout" }
+          ];
+        } else if (newScreen === "history") {
+          newBreadcrumbs = [
+            { name: "Главная", screen: "main" },
+            { name: "История заказов", screen: "history" }
+          ];
+        }
+        
+        setBreadcrumbs(newBreadcrumbs);
+      };
+
+      const navigateTo = (screen) => {
+        setScreen(screen);
+        updateBreadcrumbs(screen);
+      };
 
       useEffect(() => {
         // Initialize Telegram Web App
@@ -83,7 +118,7 @@
         if (screen === "cart" && cart.length > 0) {
           Telegram.WebApp.MainButton.setText("Оформить заказ");
           Telegram.WebApp.MainButton.show();
-          Telegram.WebApp.MainButton.onClick(() => setScreen("checkout"));
+          Telegram.WebApp.MainButton.onClick(() => navigateTo("checkout"));
         } else if (screen === "checkout") {
           Telegram.WebApp.MainButton.setText("Отправить заказ");
           Telegram.WebApp.MainButton.show();
@@ -91,18 +126,13 @@
         } else if (screen === "product_details") {
           Telegram.WebApp.MainButton.setText("Добавить в корзину");
           Telegram.WebApp.MainButton.show();
-          Telegram.WebApp.MainButton.onClick(() => handleAddToCart(selectedProduct, false));
+          Telegram.WebApp.MainButton.onClick(() => handleAddToCart(selectedProduct));
         }
       }, [screen, cart, selectedProduct]);
 
-      const handleAddToCart = (product, isPack = false) => {
-        if (quantity < 1 || quantity > product.available_units) {
-          Telegram.WebApp.showAlert(`Недопустимое количество. Доступно: ${product.available_units} шт.`);
-          return;
-        }
+      const handleAddToCart = (product, isPack = false, quantity = 1) => {
         setCart([...cart, { ...product, isPack, quantity }]);
-        Telegram.WebApp.showAlert(`Добавлено: ${product.name} (${isPack ? "упаковка" : "поштучно"}, ${quantity} шт.)`);
-        setQuantity(1); // Reset quantity
+        Telegram.WebApp.showAlert(`Добавлено: ${product.name} (${isPack ? "упаковка" : "поштучно"})`);
       };
 
       const handleCheckout = () => {
@@ -112,7 +142,7 @@
         }
         const order = {
           id: orders.length + 1,
-          user_id: Telegram.WebApp.initDataUnsafe.user?.id || 0,
+          user_id: Telegram.WebApp.initDataUnsafe.user?.id || 1,
           total_price: cart.reduce((sum, item) => sum + (item.isPack ? item.price_per_pack : item.price_per_unit) * item.quantity, 0),
           items: cart,
           created_at: new Date().toISOString(),
@@ -121,264 +151,272 @@
         setCart([]);
         setCheckoutData({ name: "", phone: "", address: "" });
         Telegram.WebApp.showAlert("Заказ успешно отправлен!");
-        setScreen("main");
+        navigateTo("main");
       };
 
       const renderMainMenu = () => (
-        <div className="p-6">
-          <h1 className="text-3xl font-bold text-center mb-6">Sdoba Zakax</h1>
-          <div className="grid grid-cols-1 gap-4">
-            <button
-              className="bg-orange-300 text-white rounded-xl p-4 shadow-md hover:bg-orange-600 transition-colors"
-              onClick={() => setScreen("catalogue")}
-            >
-              Каталог
-            </button>
-            <button
-              className="bg-orange-300 text-white rounded-xl p-4 shadow-md hover:bg-orange-600 transition-colors"
-              onClick={() => setScreen("cart")}
-            >
-              Корзина ({cart.length})
-            </button>
-            <button
-              className="bg-orange-300 text-white rounded-xl p-4 shadow-md hover:bg-orange-600 transition-colors"
-              onClick={() => setScreen("history")}
-            >
-              История заказов
-            </button>
-          </div>
+        <div className="p-4">
+          <h1 className="text-2xl font-bold mb-6 text-center text-orange-600">Добро пожаловать в Sdoba Zakax!</h1>
+          <button 
+            className="w-full bg-orange-100 text-orange-800 p-4 mb-4 rounded-2xl shadow-md hover:bg-orange-200 transition-colors"
+            onClick={() => navigateTo("catalog")}
+          >
+            Каталог
+          </button>
+          <button 
+            className="w-full bg-orange-100 text-orange-800 p-4 mb-4 rounded-2xl shadow-md hover:bg-orange-200 transition-colors"
+            onClick={() => navigateTo("cart")}
+          >
+            Корзина ({cart.length})
+          </button>
+          <button 
+            className="w-full bg-orange-100 text-orange-800 p-4 rounded-2xl shadow-md hover:bg-orange-200 transition-colors"
+            onClick={() => navigateTo("history")}
+          >
+            История заказов
+          </button>
         </div>
       );
 
       const renderCatalog = () => (
-        <div>
-          <Breadcrumbs screen={screen} setScreen={setScreen} />
-          <div className="p-6">
-            <h2 className="text-2xl font-semibold mb-4 text-center">Категории</h2>
-            <div className="grid grid-cols-2 gap-4">
-              {mockCategories.map((category) => (
-                <div
-                  key={category.id}
-                  className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
-                  onClick={() => {
-                    setSelectedCategory(category);
-                    setScreen("products");
-                  }}
-                >
-                  <img src={category.image} alt={category.name} className="w-full h-40 object-cover" />
-                  <div className="p-3 text-center">
-                    <h3 className="text-lg font-medium">{category.name}</h3>
-                  </div>
+        <div className="p-4">
+          <Breadcrumbs path={breadcrumbs} onNavigate={navigateTo} />
+          <h2 className="text-xl font-bold mb-4 text-orange-600">Категории</h2>
+          <div className="grid grid-cols-2 gap-4">
+            {mockCategories.map(category => (
+              <button
+                key={category.id}
+                className="bg-white p-0 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow"
+                onClick={() => { 
+                  setSelectedCategory(category); 
+                  navigateTo("products"); 
+                }}
+              >
+                <img src={category.image} alt={category.name} className="w-full h-32 object-cover" />
+                <div className="p-2">
+                  <h3 className="font-medium text-center">{category.name}</h3>
                 </div>
-              ))}
-            </div>
-            <button
-              className="w-full bg-orange-300 text-white rounded-xl p-3 mt-6 hover:bg-orange-600 transition-colors"
-              onClick={() => setScreen("mainMenu")}
-            >
-              Назад
-            </button>
+              </button>
+            ))}
           </div>
         </div>
       );
 
       const renderProducts = () => (
-        <div>
-          <Breadcrumbs
-            screen={screen}
-            selectedCategory={selectedCategory}
-            setScreen={setScreen}
-          />
-          <div className="p-6">
-            <h2 className="text-2xl font-semibold mb-4 text-center">{selectedCategory.name}</h2>
-            <div className="grid grid-cols-2 gap-4">
-              {mock_products
-                .filter((product) => product.category_id === selectedCategory.id)
-                .map((product) => (
-                  <div
-                    key={product.id}
-                    className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
-                    onClick={() => {
-                      setSelectedProduct(product);
-                      setScreen("product_details");
-                    }}
-                  >
-                    <img src={product.image} alt={product.name} className="w-full h-40 object-cover" />
-                    <div className="p-3 text-center">
-                      <h3 className="text-lg font-medium">{product.name}</h3>
-                      <p className="text-gray-600">{product.price_per_unit}₽/шт.</p>
-                      <p className="text-sm text-gray-500">Доступно: {product.available_units} шт.</p>
-                    </div>
+        <div className="p-4">
+          <Breadcrumbs path={breadcrumbs} onNavigate={navigateTo} />
+          <h2 className="text-xl font-bold mb-4 text-orange-600">{selectedCategory.name}</h2>
+          <div className="grid grid-cols-2 gap-4">
+            {mockProducts
+              .filter(product => product.category_id === selectedCategory.id)
+              .map(product => (
+                <button
+                  key={product.id}
+                  className="bg-white p-0 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow"
+                  onClick={() => { 
+                    setSelectedProduct(product); 
+                    navigateTo("product_details"); 
+                  }}
+                >
+                  <img src={product.image} alt={product.name} className="w-full h-32 object-cover" />
+                  <div className="p-2">
+                    <h3 className="font-medium">{product.name}</h3>
+                    <p className="text-orange-600 font-bold">{product.price_per_unit}₽</p>
+                    <p className="text-sm text-gray-500">Доступно: {product.available_units} шт.</p>
                   </div>
-                ))}
-            </div>
-            <button
-              className="w-full bg-orange-300 text-white rounded-xl p-3 mt-6 hover:bg-orange-600 transition-colors"
-              onClick={() => setScreen("catalogue")}
-            >
-              Назад
-            </button>
+                </button>
+              ))}
           </div>
         </div>
       );
 
       const renderProductDetails = () => (
-        <div>
-          <Breadcrumbs
-            screen={screen}
-            selectedCategory={selectedCategory}
-            selectedProduct={selectedProduct}
-            setScreen={setScreen}
-          />
-          <div className="p-6">
-            <img src={selectedProduct.image} alt={selectedProduct.name} className="w-full h-64 object-cover rounded-lg mb-4" />
-            <h2 className="text-2xl font-semibold mb-4">{selectedProduct.name}</h2>
-            <p className="text-gray-700 mb-2">Артикул: {selectedProduct.article}</p>
-            <p className="text-gray-700 mb-2">Вес: {selectedProduct.weight} г</p>
-            <p className="text-gray-700 mb-2">Цена за шт.: {selectedProduct.price_per_unit}₽</p>
-            <p className="text-gray-700 mb-2">Цена за упаковку ({selectedProduct.units_per_pack} шт.): {selectedProduct.price_per_pack}₽</p>
-            <p className="text-gray-700 mb-2">Срок хранения: {selectedProduct.storage_period}</p>
-            <p className="text-gray-700 mb-4">Технология: {selectedProduct.technology}</p>
-            <p className="text-gray-700 mb-4">Доступно: {selectedProduct.available_units} шт.</p>
-            <div className="mb-4">
-              <label className="block text-gray-700 mb-2">Количество:</label>
-              <input
-                type="number"
-                min="1"
-                max={selectedProduct.available_units}
-                value={quantity}
-                onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                className="w-20 p-2 border rounded-lg"
-              />
+        <div className="p-4">
+          <Breadcrumbs path={breadcrumbs} onNavigate={navigateTo} />
+          <div className="bg-white rounded-xl shadow-md overflow-hidden mb-4">
+            <img src={selectedProduct.image} alt={selectedProduct.name} className="w-full h-48 object-cover" />
+            <div className="p-4">
+              <h2 className="text-xl font-bold mb-2">{selectedProduct.name}</h2>
+              <div className="grid grid-cols-2 gap-2 mb-4">
+                <div>
+                  <p className="text-gray-600">Артикул:</p>
+                  <p>{selectedProduct.article}</p>
+                </div>
+                <div>
+                  <p className="text-gray-600">Вес:</p>
+                  <p>{selectedProduct.weight} г</p>
+                </div>
+                <div>
+                  <p className="text-gray-600">Цена за шт.:</p>
+                  <p className="text-orange-600 font-bold">{selectedProduct.price_per_unit}₽</p>
+                </div>
+                <div>
+                  <p className="text-gray-600">Цена за упаковку:</p>
+                  <p className="text-orange-600 font-bold">{selectedProduct.price_per_pack}₽ ({selectedProduct.units_per_pack} шт.)</p>
+                </div>
+                <div>
+                  <p className="text-gray-600">Срок хранения:</p>
+                  <p>{selectedProduct.storage_period}</p>
+                </div>
+                <div>
+                  <p className="text-gray-600">Технология:</p>
+                  <p>{selectedProduct.technology}</p>
+                </div>
+              </div>
+              <p className="text-gray-600 mb-2">Доступно: {selectedProduct.available_units} шт.</p>
             </div>
-            <div className="flex space-x-4 mb-6">
-              <button
-                className="flex-1 bg-orange-300 text-white rounded-xl p-3 hover:bg-orange-600 transition-colors"
-                onClick={() => handleAddToCart(selectedProduct, false)}
-              >
-                Поштучно
-              </button>
-              <button
-                className="flex-1 bg-orange-300 text-white rounded-xl p-3 hover:bg-orange-600 transition-colors"
-                onClick={() => handleAddToCart(selectedProduct, true)}
-              >
-                Упаковкой
-              </button>
-            </div>
+          </div>
+          
+          <div className="flex space-x-4 mb-4">
             <button
-              className="w-full bg-orange-300 text-white rounded-xl p-3 hover:bg-orange-600 transition-colors"
-              onClick={() => setScreen("products")}
+              className="flex-1 bg-orange-100 text-orange-800 p-3 rounded-xl shadow-md hover:bg-orange-200 transition-colors"
+              onClick={() => handleAddToCart(selectedProduct, false)}
             >
-              Назад
+              Поштучно
+            </button>
+            <button
+              className="flex-1 bg-orange-100 text-orange-800 p-3 rounded-xl shadow-md hover:bg-orange-200 transition-colors"
+              onClick={() => handleAddToCart(selectedProduct, true)}
+            >
+              Упаковкой
             </button>
           </div>
         </div>
       );
 
       const renderCart = () => (
-        <div className="p-6">
-          <h2 className="text-2xl font-semibold mb-4 text-center">Корзина</h2>
+        <div className="p-4">
+          <Breadcrumbs path={breadcrumbs} onNavigate={navigateTo} />
+          <h2 className="text-xl font-bold mb-4 text-orange-600">Корзина</h2>
           {cart.length === 0 ? (
-            <p className="text-center text-gray-600">Ваша корзина пуста.</p>
+            <div className="bg-white p-6 rounded-xl shadow-md text-center">
+              <p>Ваша корзина пуста.</p>
+              <button 
+                className="mt-4 bg-orange-100 text-orange-800 p-3 rounded-xl shadow-md hover:bg-orange-200 transition-colors"
+                onClick={() => navigateTo("catalog")}
+              >
+                Перейти в каталог
+              </button>
+            </div>
           ) : (
             <>
-              {cart.map((item, index) => (
-                <div key={index} className="bg-white rounded-lg shadow-md p-4 mb-4">
-                  <div className="flex items-center">
-                    <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-lg mr-4" />
-                    <div>
-                      <p className="font-medium">{item.name}</p>
-                      <p className="text-gray-600">{item.quantity} {item.isPack ? "упаковок" : "шт."}</p>
-                      <p className="text-gray-600">Цена: {(item.isPack ? item.price_per_pack : item.price_per_unit) * item.quantity}₽</p>
+              <div className="bg-white rounded-xl shadow-md overflow-hidden mb-4">
+                {cart.map((item, index) => (
+                  <div key={index} className="p-4 border-b last:border-b-0">
+                    <div className="flex items-start">
+                      <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-lg mr-3" />
+                      <div className="flex-1">
+                        <h3 className="font-medium">{item.name}</h3>
+                        <p className="text-sm text-gray-600">{item.quantity} {item.isPack ? "упаковок" : "шт."}</p>
+                        <p className="text-orange-600 font-bold">{(item.isPack ? item.price_per_pack : item.price_per_unit) * item.quantity}₽</p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-              <p className="text-xl font-bold text-center mb-4">
-                Итого: {cart.reduce((sum, item) => sum + (item.isPack ? item.price_per_pack : item.price_per_unit) * item.quantity, 0)}₽
-              </p>
-              <button
-                className="w-full bg-orange-300 text-white rounded-xl p-3 mb-4 hover:bg-orange-600 transition-colors"
+                ))}
+              </div>
+              
+              <div className="bg-white p-4 rounded-xl shadow-md mb-4">
+                <p className="font-bold text-lg text-right">Итого: {cart.reduce((sum, item) => sum + (item.isPack ? item.price_per_pack : item.price_per_unit) * item.quantity, 0)}₽</p>
+              </div>
+              
+              <button 
+                className="w-full bg-red-100 text-red-800 p-3 rounded-xl shadow-md hover:bg-red-200 transition-colors mb-4"
                 onClick={() => setCart([])}
               >
                 Очистить корзину
               </button>
             </>
           )}
-          <button
-            className="w-full bg-orange-300 text-white rounded-xl p-3 hover:bg-orange-600 transition-colors"
-            onClick={() => setScreen("mainMenu")}
-          >
-            Назад
-          </button>
         </div>
       );
 
       const renderCheckout = () => (
-        <div className="p-6">
-          <h2 className="text-2xl font-semibold mb-4 text-center">Оформление заказа</h2>
-          <input
-            type="text"
-            placeholder="Имя"
-            className="w-full p-3 mb-4 border rounded-lg"
-            value={checkoutData.name}
-            onChange={(e) => setCheckoutData({ ...checkoutData, name: e.target.value })}
-          />
-          <input
-            type="text"
-            placeholder="Телефон"
-            className="w-full p-3 mb-4 border rounded-lg"
-            value={checkoutData.phone}
-            onChange={(e) => setCheckoutData({ ...checkoutData, phone: e.target.value })}
-          />
-          <input
-            type="text"
-            placeholder="Адрес"
-            className="w-full p-3 mb-4 border rounded-lg"
-            value={checkoutData.address}
-            onChange={(e) => setCheckoutData({ ...checkoutData, address: e.target.value })}
-          />
-          <button
-            className="w-full bg-orange-300 text-white rounded-xl p-3 hover:bg-orange-600 transition-colors"
-            onClick={() => setScreen("cart")}
-          >
-            Назад
-          </button>
+        <div className="p-4">
+          <Breadcrumbs path={breadcrumbs} onNavigate={navigateTo} />
+          <h2 className="text-xl font-bold mb-4 text-orange-600">Оформление заказа</h2>
+          <div className="bg-white p-4 rounded-xl shadow-md">
+            <div className="mb-4">
+              <label className="block text-gray-700 mb-1">Имя</label>
+              <input
+                type="text"
+                placeholder="Ваше имя"
+                className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-200"
+                value={checkoutData.name}
+                onChange={e => setCheckoutData({ ...checkoutData, name: e.target.value })}
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700 mb-1">Телефон</label>
+              <input
+                type="tel"
+                placeholder="Ваш телефон"
+                className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-200"
+                value={checkoutData.phone}
+                onChange={e => setCheckoutData({ ...checkoutData, phone: e.target.value })}
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700 mb-1">Адрес</label>
+              <input
+                type="text"
+                placeholder="Адрес доставки"
+                className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-200"
+                value={checkoutData.address}
+                onChange={e => setCheckoutData({ ...checkoutData, address: e.target.value })}
+              />
+            </div>
+          </div>
         </div>
       );
 
       const renderHistory = () => (
-        <div className="p-6">
-          <h2 className="text-2xl font-semibold mb-4 text-center">История заказов</h2>
+        <div className="p-4">
+          <Breadcrumbs path={breadcrumbs} onNavigate={navigateTo} />
+          <h2 className="text-xl font-bold mb-4 text-orange-600">История заказов</h2>
           {orders.length === 0 ? (
-            <p className="text-center text-gray-600">У вас пока нет заказов.</p>
+            <div className="bg-white p-6 rounded-xl shadow-md text-center">
+              <p>У вас пока нет заказов.</p>
+              <button 
+                className="mt-4 bg-orange-100 text-orange-800 p-3 rounded-xl shadow-md hover:bg-orange-200 transition-colors"
+                onClick={() => navigateTo("catalog")}
+              >
+                Перейти в каталог
+              </button>
+            </div>
           ) : (
-            orders.map((order) => (
-              <div key={order.id} className="bg-white rounded-lg shadow-md p-4 mb-4">
-                <p className="font-medium">Заказ #{order.id} ({new Date(order.created_at).toLocaleString()})</p>
-                <p className="text-gray-600">Итого: {order.total_price}₽</p>
-                {order.items.map((item, index) => (
-                  <div key={index} className="flex items-center mt-2">
-                    <img src={item.image} alt={item.name} className="w-12 h-12 object-cover rounded-lg mr-3" />
-                    <p className="text-gray-600">- {item.name} - {item.quantity} {item.isPack ? "упаковок" : "шт."}</p>
+            <div className="space-y-4">
+              {orders.map(order => (
+                <div key={order.id} className="bg-white rounded-xl shadow-md overflow-hidden">
+                  <div className="p-4 border-b">
+                    <div className="flex justify-between items-center">
+                      <h3 className="font-bold">Заказ #{order.id}</h3>
+                      <p className="text-orange-600 font-bold">{order.total_price}₽</p>
+                    </div>
+                    <p className="text-sm text-gray-500">{new Date(order.created_at).toLocaleString()}</p>
                   </div>
-                ))}
-              </div>
-            ))
+                  <div className="p-4">
+                    {order.items.map((item, index) => (
+                      <div key={index} className="flex items-center mb-3 last:mb-0">
+                        <img src={item.image} alt={item.name} className="w-12 h-12 object-cover rounded-lg mr-3" />
+                        <div className="flex-1">
+                          <p>{item.name}</p>
+                          <p className="text-sm text-gray-600">{item.quantity} {item.isPack ? "упаковок" : "шт."}</p>
+                        </div>
+                        <p className="text-orange-600">{(item.isPack ? item.price_per_pack : item.price_per_unit) * item.quantity}₽</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
-          <button
-            className="w-full bg-orange-300 text-white rounded-xl p-3 hover:bg-orange-600 transition-colors"
-            onClick={() => setScreen("mainMenu")}
-          >
-            Назад
-          </button>
         </div>
       );
 
       return (
-        <div className="min-h-screen bg-gray-100">
-          {screen === "mainMenu" && renderMainMenu()}
-          {screen === "catalogue" && renderCatalog()}
+        <div className="min-h-screen bg-gray-50">
+          {screen === "main" && renderMainMenu()}
+          {screen === "catalog" && renderCatalog()}
           {screen === "products" && renderProducts()}
           {screen === "product_details" && renderProductDetails()}
           {screen === "cart" && renderCart()}
