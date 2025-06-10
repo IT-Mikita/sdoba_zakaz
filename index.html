@@ -10,542 +10,23 @@
   <script src="https://cdn.jsdelivr.net/npm/axios@1.4.0/dist/axios.min.js"></script>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    .bg-primary-accent { background-color: #bc9565; }
+    .text-primary-accent { color: #bc9565; }
+    .hover\:bg-primary-accent:hover { background-color: #a78455; }
+    .bg-secondary-accent { background-color: #15384b; }
+    .text-secondary-accent { color: #15384b; }
+    .hover\:bg-secondary-accent:hover { background-color: #0f2a3a; }
+  </style>
 </head>
 <body>
   <div id="root"></div>
   <script type="text/babel">
     const { useState, useEffect } = React;
 
-    // Mock product data with subcategories
-    const mockCategories = [
-    { 
-        id: 1, 
-        name: "Маффины", 
-        image: "https://pastrichi.ru/upload/resize_cache/iblock/0ce/800_800_1/oery87bcnkfmk4of27zoxwg7zim6hef7.png",
-        subcategories: [
-        { id: 101, name: "Маффины 120 граммов (готовые)", storage_period: "6 месяцев" },
-        { id: 102, name: "Маффины 90 граммов (готовые)", storage_period: "6 месяцев" },
-        { id: 103, name: "Маффины 65 граммов (готовые)", storage_period: "6 месяцев" },
-        { id: 104, name: "Маффины в индивидуальной упаковке (готовые)", storage_period: "6 месяцев" }
-        ]
-    },
-    { 
-        id: 2, 
-        name: "Крунаты", 
-        image: "https://pastrichi.ru/upload/resize_cache/iblock/3dc/800_800_1/3e21v9shi682i96jgr0rhdewmslvq2qo.png",
-        subcategories: [
-        { id: 201, name: "Крунаты (готовые)", storage_period: "6 месяцев" }
-        ]
-    },
-    { 
-        id: 3, 
-        name: "Круассаны", 
-        image: "https://pastrichi.ru/upload/resize_cache/iblock/44c/800_800_1/2vy8macuwltbgpybqdxrhe8fofsa6nj1.png",
-        subcategories: [
-        { id: 301, name: "Круассаны на сливочном масле", storage_period: "6 месяцев" },
-        { id: 302, name: "Круассаны «Премиум»", storage_period: "12 месяцев" },
-        { id: 303, name: "Круассаны с цветным декором (готовые)", storage_period: "6 месяцев" },
-        { id: 304, name: "Круассаны классические", storage_period: "6 месяцев" }
-        ]
-    },
-    { 
-        id: 4, 
-        name: "Слоёные изделия", 
-        image: "https://pastrichi.ru/upload/resize_cache/iblock/bc0/800_800_1/voffg5uws6mpk41d1asqhvf6oonh7zwl.png",
-        subcategories: [
-        { id: 401, name: "Улитки", storage_period: "6 месяцев" },
-        { id: 402, name: "Тречча (АКЦИЯ)", storage_period: "6 месяцев" },
-        { id: 403, name: "Тречча (готовая) (АКЦИЯ)", storage_period: "6 месяцев" },
-        { id: 404, name: "Кленовый пекан (готовый)", storage_period: "6 месяцев" },
-        { id: 405, name: "Кленовый пекан", storage_period: "6 месяцев" },
-        { id: 406, name: "Слойки сладкие", storage_period: "6 месяцев" },
-        { id: 407, name: "Слойки сытные", storage_period: "6 месяцев" },
-        { id: 408, name: "Розаны (АКЦИЯ)", storage_period: "6 месяцев" },
-        { id: 409, name: "Штрудели", storage_period: "6 месяцев" },
-        { id: 410, name: "Хачапури (бездрожжевое)", storage_period: "6 месяцев" },
-        { id: 411, name: "Самса", storage_period: "6 месяцев" },
-        { id: 412, name: "Ватрушки", storage_period: "6 месяцев" },
-        { id: 413, name: "Буреки из теста Фило", storage_period: "6 месяцев" }
-        ]
-    },
-    { 
-        id: 5, 
-        name: "Сдоба", 
-        image: "https://pastrichi.ru/upload/resize_cache/iblock/435/800_800_1/suugfmaxorh0pvb8u1q9ricrvhibuujf.png",
-        subcategories: [
-        { id: 501, name: "Шоссон", storage_period: "6 месяцев" },
-        { id: 502, name: "Расстегаи (готовые)", storage_period: "6 месяцев" },
-        { id: 503, name: "Пирожки сдобные (готовые)", storage_period: "6 месяцев" }
-        ]
-    },
-    { 
-        id: 6, 
-        name: "Сочники", 
-        image: "https://obedservis.by/wp-content/uploads/2019/01/Sochnik.jpg",
-        subcategories: [
-        { id: 601, name: "Сочники (готовые)", storage_period: "6 месяцев" }
-        ]
-    },
-    { 
-        id: 7, 
-        name: "Сэндвичи", 
-        image: "https://pastrichi.ru/upload/iblock/9ac/h1nlnupqn12cx8z0qhxey1rwvdxcmms1.png",
-        subcategories: [
-        { id: 701, name: "Клаб-сэндвичи (готовые)", storage_period: "3 месяца" },
-        { id: 702, name: "Сэндвич-роллы (готовые)", storage_period: "3 месяца" },
-        { id: 703, name: "Сэндвичи на чиабатте (готовые)", storage_period: "3 месяца" },
-        { id: 704, name: "Сэндвичи на круассане (готовые)", storage_period: "3 месяца" },
-        { id: 705, name: "Панини (готовые)", storage_period: "3 месяца" }
-        ]
-    },
-    { 
-        id: 8, 
-        name: "Пиццы", 
-        image: "https://pastrichi.ru/upload/resize_cache/iblock/c90/800_800_1/gcj39s22vi0a1dh6v0pani1dqiyynm9s.png",
-        subcategories: [
-        { id: 801, name: "Римские пиццы (требуют допекания в печи)", storage_period: "6 месяцев" }
-        ]
-    },
-    { 
-        id: 9, 
-        name: "Выпечка и закуски для СВЧ", 
-        image: "https://pastrichi.ru/upload/resize_cache/iblock/8b3/800_800_1/wo4ssu1593i1yr6ua8869jcrqkaygbsd.png",
-        subcategories: [
-        { id: 901, name: "Сырники (готовые)", storage_period: "6 месяцев" },
-        { id: 902, name: "Блины (готовые, весовой товар)", storage_period: "6 месяцев" },
-        { id: 903, name: "Оладьи (готовые, весовой товар)", storage_period: "6 месяцев" },
-        { id: 904, name: "Грилата (готовая)", storage_period: "6 месяцев" },
-        { id: 905, name: "Пирожки (готовые)", storage_period: "6 месяцев" },
-        { id: 906, name: "Пицца (готовая)", storage_period: "6 месяцев" }
-        ]
-    },
-    {
-        id: 10,
-        name: "Беляши и чебуреки",
-        image: "https://pastrichi.ru/upload/resize_cache/iblock/09c/800_800_1/ulsr3n09b5xgavefis99ft8rnghre612.png",
-        subcategories: [
-        { id: 1001, name: "Беляши (готовые)", storage_period: "6 месяцев" },
-        { id: 1002, name: "Чебуреки (готовые)", storage_period: "6 месяцев" }
-        ]
-    },
-    {
-        id: 11,
-        name: "Десерты",
-        image: "https://pastrichi.ru/upload/resize_cache/iblock/cf6/800_800_1/z953ruuv72cz57yu4i29azyb7hryz37k.png",
-        subcategories: [
-        { id: 1101, name: "Американское печенье «Кукис» с полезными свойствами (готовое)", storage_period: "6 месяцев" },
-        { id: 1102, name: "Американское печенье «Кукис» классическое (готовое)", storage_period: "6 месяцев" },
-        { id: 1103, name: "Вупи Пай (готовый)", storage_period: "6 месяцев" },
-        { id: 1104, name: "Кексы (готовые)", storage_period: "6 месяцев" },
-        { id: 1105, name: "Штрудели (готовые)", storage_period: "6 месяцев" },
-        { id: 1106, name: "Ромовая баба (готовая)", storage_period: "6 месяцев" },
-        { id: 1107, name: "Брауни (готовый)", storage_period: "6 месяцев" },
-        { id: 1108, name: "Тарталетки (готовые)", storage_period: "6 месяцев" },
-        { id: 1109, name: "Паштел-де-ната (АКЦИЯ)", storage_period: "6 месяцев" },
-        { id: 1110, name: "Донатсы Ассорти (готовые)", storage_period: "6 месяцев" },
-        { id: 1111, name: "Донатсы с начинкой (готовые) (АКЦИЯ)", storage_period: "6 месяцев" },
-        { id: 1112, name: "Кейк - Попсы (готовые)", storage_period: "6 месяцев" },
-        { id: 1113, name: "Пирожное «Макарунс» (готовые)", storage_period: "6 месяцев" }
-        ]
-    },
-    {
-        id: 12,
-        name: "Кондитерские изделия",
-        image: "https://pastrichi.ru/upload/resize_cache/iblock/807/800_800_1/x6eqlsfk6q92ia1o7wc9jnbturdo7q0q.png",
-        subcategories: [
-        { id: 1201, name: "Чизкейки классические (готовые)", storage_period: "6 месяцев" },
-        { id: 1202, name: "Пироги (тарты) порционные", storage_period: "6 месяцев" },
-        { id: 1203, name: "Порционные торты (готовые) (АКЦИЯ)", storage_period: "6 месяцев" },
-        { id: 1204, name: "Пирожные (готовые)", storage_period: "6 месяцев" },
-        { id: 1205, name: "Эклеры «Премиум» (готовые)", storage_period: "6 месяцев" },
-        { id: 1206, name: "Эклеры классические (готовые)", storage_period: "6 месяцев" },
-        { id: 1207, name: "Вафельные трубочки (готовые)", storage_period: "6 месяцев" }
-        ]
-    },
-    {
-        id: 13,
-        name: "Хлеб и булочки",
-        image: "https://pastrichi.ru/upload/resize_cache/iblock/0d9/800_800_1/mdwpoag0yj2y0rbf2bqpgd0dt9c2uv72.png",
-        subcategories: [
-        { id: 1301, name: "Багеты (требуют допекания в печи)", storage_period: "6 месяцев" },
-        { id: 1302, name: "Чиабатты (требуют допекания в печи)", storage_period: "6 месяцев" },
-        { id: 1303, name: "Булочки для сэндвичей", storage_period: "6 месяцев" }
-        ]
-    }
-    ];
+    // API base URL
+    const API_BASE_URL = "http://31.129.109.140:5650"; // Adjust for production
 
-    const mockProducts = [
-    // Маффины 120 граммов (готовые)
-    { id: 1, category_id: 1, subcategory_id: 101, name: "Маффин Сливочный с черникой «Элит»", article: "770136", weight: 120, price_per_unit: 73.13, units_per_pack: 20, price_per_pack: 1462.60, storage_period: "6 мес.", technology: "RD", available_units: 20 },
-    { id: 2, category_id: 1, subcategory_id: 101, name: "Маффин «Три шоколада»", article: "770220", weight: 120, price_per_unit: 75.45, units_per_pack: 20, price_per_pack: 1509.00, storage_period: "6 мес.", technology: "RD", available_units: 15 },
-    { id: 3, category_id: 1, subcategory_id: 101, name: "Маффин «Солёная карамель»", article: "770219", weight: 120, price_per_unit: 68.50, units_per_pack: 20, price_per_pack: 1370.00, storage_period: "6 мес.", technology: "RD", available_units: 10 },
-    { id: 4, category_id: 1, subcategory_id: 101, name: "Маффин Шоколадный с шоколадной крошкой «Элит»", article: "770117", weight: 120, price_per_unit: 79.60, units_per_pack: 20, price_per_pack: 1592.00, storage_period: "6 мес.", technology: "RD", available_units: 12 },
-    { id: 5, category_id: 1, subcategory_id: 101, name: "Маффин Сливочный с шоколадом «Элит»", article: "770116", weight: 120, price_per_unit: 70.69, units_per_pack: 20, price_per_pack: 1413.80, storage_period: "6 мес.", technology: "RD", available_units: 18 },
-    { id: 6, category_id: 1, subcategory_id: 101, name: "Маффин Шоколадный «Элит»", article: "770115", weight: 120, price_per_unit: 64.20, units_per_pack: 20, price_per_pack: 1284.00, storage_period: "6 мес.", technology: "RD", available_units: 14 },
-    { id: 7, category_id: 1, subcategory_id: 101, name: "Маффин Сливочный с брусникой «Элит»", article: "770118", weight: 120, price_per_unit: 67.45, units_per_pack: 20, price_per_pack: 1349.00, storage_period: "6 мес.", technology: "RD", available_units: 16 },
-
-    // Маффины 90 граммов (готовые)
-    { id: 8, category_id: 1, subcategory_id: 102, name: "Маффин сливочный «Мандарин-Брусника»", article: "770316", weight: 90, price_per_unit: 44.99, units_per_pack: 20, price_per_pack: 899.80, storage_period: "6 мес.", technology: "RD", available_units: 20 },
-    { id: 9, category_id: 1, subcategory_id: 102, name: "Маффин «Ред Вельвет»", article: "770315", weight: 90, price_per_unit: 62.95, units_per_pack: 20, price_per_pack: 1259.00, storage_period: "6 мес.", technology: "RD", available_units: 15 },
-    { id: 10, category_id: 1, subcategory_id: 102, name: "Маффин «Солёная карамель»", article: "770222", weight: 90, price_per_unit: 53.95, units_per_pack: 20, price_per_pack: 1079.00, storage_period: "6 мес.", technology: "RD", available_units: 10 },
-    { id: 11, category_id: 1, subcategory_id: 102, name: "Маффин Сливочный с шоколадом и клубничной начинкой", article: "770217", weight: 90, price_per_unit: 47.45, units_per_pack: 20, price_per_pack: 949.00, storage_period: "6 мес.", technology: "RD", available_units: 12 },
-    { id: 12, category_id: 1, subcategory_id: 102, name: "Маффин Сливочный с шоколадом и вишневой начинкой", article: "770209", weight: 90, price_per_unit: 53.30, units_per_pack: 20, price_per_pack: 1066.00, storage_period: "6 мес.", technology: "RD", available_units: 18 },
-    { id: 13, category_id: 1, subcategory_id: 102, name: "Маффин Сливочный с апельсиновыми цукатами и шоколадом", article: "770106", weight: 90, price_per_unit: 66.02, units_per_pack: 20, price_per_pack: 1320.40, storage_period: "6 мес.", technology: "RD", available_units: 14 },
-    { id: 14, category_id: 1, subcategory_id: 102, name: "Маффин Сливочный с малиновой начинкой", article: "770169", weight: 90, price_per_unit: 51.86, units_per_pack: 20, price_per_pack: 1037.20, storage_period: "6 мес.", technology: "RD", available_units: 16 },
-    { id: 15, category_id: 1, subcategory_id: 102, name: "Маффин Сливочный с шоколадом", article: "770132", weight: 90, price_per_unit: 55.30, units_per_pack: 20, price_per_pack: 1106.00, storage_period: "6 мес.", technology: "RD", available_units: 20 },
-    { id: 16, category_id: 1, subcategory_id: 102, name: "Маффин Шоколадный", article: "770134", weight: 90, price_per_unit: 52.65, units_per_pack: 20, price_per_pack: 1053.00, storage_period: "6 мес.", technology: "RD", available_units: 15 },
-    { id: 17, category_id: 1, subcategory_id: 102, name: "Маффин Сливочный с черникой", article: "770133", weight: 90, price_per_unit: 57.40, units_per_pack: 20, price_per_pack: 1148.00, storage_period: "6 мес.", technology: "RD", available_units: 10 },
-    { id: 18, category_id: 1, subcategory_id: 102, name: "Маффин Сливочный с брусникой", article: "770131", weight: 90, price_per_unit: 49.50, units_per_pack: 20, price_per_pack: 990.00, storage_period: "6 мес.", technology: "RD", available_units: 12 },
-    { id: 19, category_id: 1, subcategory_id: 102, name: "Маффин Шоколадный с шоколадной крошкой", article: "770135", weight: 90, price_per_unit: 63.10, units_per_pack: 20, price_per_pack: 1262.00, storage_period: "6 мес.", technology: "RD", available_units: 18 },
-    { id: 20, category_id: 1, subcategory_id: 102, name: "Маффин Сливочный с ванильной начинкой", article: "770149", weight: 90, price_per_unit: 50.31, units_per_pack: 20, price_per_pack: 1006.20, storage_period: "6 мес.", technology: "RD", available_units: 14 },
-    { id: 21, category_id: 1, subcategory_id: 102, name: "Маффин Шоколадный с шоколадной начинкой", article: "770150", weight: 90, price_per_unit: 57.80, units_per_pack: 20, price_per_pack: 1156.00, storage_period: "6 мес.", technology: "RD", available_units: 16 },
-
-    // Маффины 65 граммов (готовые)
-    { id: 22, category_id: 1, subcategory_id: 103, name: "Маффин Шоколадный", article: "770127", weight: 65, price_per_unit: 40.60, units_per_pack: 20, price_per_pack: 812.00, storage_period: "6 мес.", technology: "RD", available_units: 20 },
-    { id: 23, category_id: 1, subcategory_id: 103, name: "Маффин Сливочный с брусникой", article: "770128", weight: 65, price_per_unit: 39.00, units_per_pack: 20, price_per_pack: 780.00, storage_period: "6 мес.", technology: "RD", available_units: 15 },
-    { id: 24, category_id: 1, subcategory_id: 103, name: "Маффин Сливочный с шоколадом", article: "770125", weight: 65, price_per_unit: 45.32, units_per_pack: 20, price_per_pack: 906.40, storage_period: "6 мес.", technology: "RD", available_units: 10 },
-    { id: 25, category_id: 1, subcategory_id: 103, name: "Маффин Сливочный с черникой", article: "770129", weight: 65, price_per_unit: 45.25, units_per_pack: 20, price_per_pack: 905.00, storage_period: "6 мес.", technology: "RD", available_units: 12 },
-    { id: 26, category_id: 1, subcategory_id: 103, name: "Маффин Шоколадный с шоколадной крошкой", article: "770130", weight: 65, price_per_unit: 49.17, units_per_pack: 20, price_per_pack: 983.40, storage_period: "6 мес.", technology: "RD", available_units: 18 },
-
-    // Маффины в индивидуальной упаковке (готовые)
-    { id: 27, category_id: 1, subcategory_id: 104, name: "Маффин Сливочный с ванильной начинкой", article: "770167", weight: 90, price_per_unit: 51.70, units_per_pack: 20, price_per_pack: 1034.00, storage_period: "6 мес.", technology: "RD", available_units: 20 },
-    { id: 28, category_id: 1, subcategory_id: 104, name: "Маффин Шоколадный с апельсином", article: "773206", weight: 50, price_per_unit: 37.80, units_per_pack: 20, price_per_pack: 756.00, storage_period: "6 мес.", technology: "RD", available_units: 15 },
-    { id: 29, category_id: 1, subcategory_id: 104, name: "Маффин Шоколадный с шоколадной крошкой «Элит»", article: "770138", weight: 120, price_per_unit: 85.30, units_per_pack: 20, price_per_pack: 1706.00, storage_period: "6 мес.", technology: "RD", available_units: 10 },
-    { id: 30, category_id: 1, subcategory_id: 104, name: "Маффин Сливочный с шоколадом «Элит»", article: "770139", weight: 120, price_per_unit: 71.25, units_per_pack: 20, price_per_pack: 1425.00, storage_period: "6 мес.", technology: "RD", available_units: 12 },
-    { id: 31, category_id: 1, subcategory_id: 104, name: "Маффин Сливочный с апельсиновыми цукатами и шоколадом", article: "770173", weight: 90, price_per_unit: 67.49, units_per_pack: 20, price_per_pack: 1349.80, storage_period: "6 мес.", technology: "RD", available_units: 18 },
-    { id: 32, category_id: 1, subcategory_id: 104, name: "Маффин Сливочный с брусникой", article: "770154", weight: 90, price_per_unit: 49.10, units_per_pack: 20, price_per_pack: 982.00, storage_period: "6 мес.", technology: "RD", available_units: 14 },
-    { id: 33, category_id: 1, subcategory_id: 104, name: "Маффин Сливочный с шоколадом", article: "770144", weight: 90, price_per_unit: 58.30, units_per_pack: 20, price_per_pack: 1166.00, storage_period: "6 мес.", technology: "RD", available_units: 16 },
-    { id: 34, category_id: 1, subcategory_id: 104, name: "Маффин Сливочный с черникой", article: "770145", weight: 90, price_per_unit: 61.05, units_per_pack: 20, price_per_pack: 1221.00, storage_period: "6 мес.", technology: "RD", available_units: 20 },
-    { id: 35, category_id: 1, subcategory_id: 104, name: "Маффин Шоколадный с шоколадной крошкой", article: "770146", weight: 90, price_per_unit: 65.35, units_per_pack: 20, price_per_pack: 1307.00, storage_period: "6 мес.", technology: "RD", available_units: 15 },
-    { id: 36, category_id: 1, subcategory_id: 104, name: "Маффин Шоколадный с апельсином", article: "771306", weight: 35, price_per_unit: 31.93, units_per_pack: 60, price_per_pack: 1915.80, storage_period: "6 мес.", technology: "RD", available_units: 10 },
-
-    // Крунаты (готовые)
-    { id: 37, category_id: 2, subcategory_id: 201, name: "Крунат «Мандарин-брусника»", article: "742359", weight: 110, price_per_unit: 89.99, units_per_pack: 12, price_per_pack: 1079.88, storage_period: "6 мес.", technology: "RD", available_units: 12 },
-    { id: 38, category_id: 2, subcategory_id: 201, name: "Крунат «Манго-облепиха»", article: "742358", weight: 110, price_per_unit: 89.99, units_per_pack: 12, price_per_pack: 1079.88, storage_period: "6 мес.", technology: "RD", available_units: 10 },
-    { id: 39, category_id: 2, subcategory_id: 201, name: "Крунат «Солёная карамель»", article: "742357", weight: 110, price_per_unit: 101.17, units_per_pack: 12, price_per_pack: 1214.04, storage_period: "6 мес.", technology: "RD", available_units: 8 },
-    { id: 40, category_id: 2, subcategory_id: 201, name: "Крунат «Малиновый»", article: "742353", weight: 110, price_per_unit: 101.17, units_per_pack: 12, price_per_pack: 1214.04, storage_period: "6 мес.", technology: "RD", available_units: 15 },
-    { id: 41, category_id: 2, subcategory_id: 201, name: "Крунат «Фисташковый»", article: "742360", weight: 110, price_per_unit: 101.17, units_per_pack: 12, price_per_pack: 1214.04, storage_period: "6 мес.", technology: "RD", available_units: 10 },
-    { id: 42, category_id: 2, subcategory_id: 201, name: "Крунат «Вишневый»", article: "742354", weight: 110, price_per_unit: 92.67, units_per_pack: 12, price_per_pack: 1112.04, storage_period: "6 мес.", technology: "RD", available_units: 12 },
-    { id: 43, category_id: 2, subcategory_id: 201, name: "Крунат «Бабл Гам»", article: "742356", weight: 110, price_per_unit: 92.67, units_per_pack: 12, price_per_pack: 1112.04, storage_period: "6 мес.", technology: "RD", available_units: 14 },
-    { id: 44, category_id: 2, subcategory_id: 201, name: "Крунат «Ванильный»", article: "742355", weight: 110, price_per_unit: 92.67, units_per_pack: 12, price_per_pack: 1112.04, storage_period: "6 мес.", technology: "RD", available_units: 16 },
-    { id: 45, category_id: 2, subcategory_id: 201, name: "Крунат «Шоколадный»", article: "742350", weight: 110, price_per_unit: 92.67, units_per_pack: 12, price_per_pack: 1112.04, storage_period: "6 мес.", technology: "RD", available_units: 18 },
-
-    // Круассаны на сливочном масле
-    { id: 46, category_id: 3, subcategory_id: 301, name: "Круассаны без начинки", article: "919422", weight: 75, price_per_unit: 60.90, units_per_pack: 30, price_per_pack: 1827.00, storage_period: "6 мес.", technology: "RST", available_units: 20 },
-    { id: 47, category_id: 3, subcategory_id: 301, name: "Круассан с миндалем и миндальным кремом", article: "919402", weight: 95, price_per_unit: 99.03, units_per_pack: 30, price_per_pack: 2970.90, storage_period: "6 мес.", technology: "RST", available_units: 15 },
-    { id: 48, category_id: 3, subcategory_id: 301, name: "Круассан с шоколадной начинкой", article: "919404", weight: 90, price_per_unit: 99.80, units_per_pack: 30, price_per_pack: 2994.00, storage_period: "6 мес.", technology: "RST", available_units: 10 },
-    { id: 49, category_id: 3, subcategory_id: 301, name: "Круассан с ветчиной и сыром", article: "919405", weight: 105, price_per_unit: 98.27, units_per_pack: 30, price_per_pack: 2948.10, storage_period: "6 мес.", technology: "RST", available_units: 12 },
-    { id: 50, category_id: 3, subcategory_id: 301, name: "Круассан с малиновой начинкой", article: "919412", weight: 95, price_per_unit: 84.57, units_per_pack: 30, price_per_pack: 2537.10, storage_period: "6 мес.", technology: "RST", available_units: 18 },
-
-    // Круассаны «Премиум»
-    { id: 51, category_id: 3, subcategory_id: 302, name: "Круассан «Премиум» с варёной сгущёнкой", article: "742331", weight: 85, price_per_unit: 46.78, units_per_pack: 50, price_per_pack: 2339.00, storage_period: "12 мес.", technology: "RST", available_units: 20 },
-    { id: 52, category_id: 3, subcategory_id: 302, name: "Круассан «Премиум» с шоколадом", article: "742326", weight: 85, price_per_unit: 44.06, units_per_pack: 50, price_per_pack: 2203.00, storage_period: "12 мес.", technology: "RST", available_units: 15 },
-    { id: 53, category_id: 3, subcategory_id: 302, name: "Круассан «Премиум» с ванильным кремом", article: "742327", weight: 85, price_per_unit: 37.80, units_per_pack: 50, price_per_pack: 1890.00, storage_period: "12 мес.", technology: "RST", available_units: 10 },
-    { id: 54, category_id: 3, subcategory_id: 302, name: "Круассан «Премиум» с ветчиной и сыром", article: "742328", weight: 85, price_per_unit: 43.72, units_per_pack: 50, price_per_pack: 2186.00, storage_period: "12 мес.", technology: "RST", available_units: 12 },
-    { id: 55, category_id: 3, subcategory_id: 302, name: "Круассан «Премиум» без начинки", article: "742325", weight: 85, price_per_unit: 37.04, units_per_pack: 50, price_per_pack: 1852.00, storage_period: "12 мес.", technology: "RST", available_units: 18 },
-
-    // Круассаны с цветным декором (готовые)
-    { id: 56, category_id: 3, subcategory_id: 303, name: "Круассан с клубничной начинкой", article: "910092", weight: 70, price_per_unit: 59.60, units_per_pack: 18, price_per_pack: 1072.80, storage_period: "6 мес.", technology: "RD", available_units: 20 },
-    { id: 57, category_id: 3, subcategory_id: 303, name: "Круассан с орехово-шоколадной начинкой", article: "910093", weight: 70, price_per_unit: 64.60, units_per_pack: 18, price_per_pack: 1162.80, storage_period: "6 мес.", technology: "RD", available_units: 15 },
-
-    // Круассаны классические
-    { id: 58, category_id: 3, subcategory_id: 304, name: "Круассан без начинки", article: "911439", weight: 85, price_per_unit: 36.10, units_per_pack: 60, price_per_pack: 2166.00, storage_period: "6 мес.", technology: "RST", available_units: 20 },
-    { id: 59, category_id: 3, subcategory_id: 304, name: "Круассан с шоколадной начинкой", article: "911438", weight: 65, price_per_unit: 25.00, units_per_pack: 50, price_per_pack: 1250.00, storage_period: "6 мес.", technology: "RST", available_units: 15 },
-
-    // Улитки
-    { id: 60, category_id: 4, subcategory_id: 401, name: "Улитка с кремом и изюмом", article: "510048", weight: 95, price_per_unit: 34.99, units_per_pack: 30, price_per_pack: 1049.70, storage_period: "6 мес.", technology: "RST", available_units: 20 },
-    { id: 61, category_id: 4, subcategory_id: 401, name: "Улитка с кремом и шоколадом", article: "510047", weight: 95, price_per_unit: 41.99, units_per_pack: 30, price_per_pack: 1259.70, storage_period: "6 мес.", technology: "RST", available_units: 15 },
-    { id: 62, category_id: 4, subcategory_id: 401, name: "Улитка с корицей", article: "510040", weight: 95, price_per_unit: 41.10, units_per_pack: 30, price_per_pack: 1233.00, storage_period: "6 мес.", technology: "RST", available_units: 10 },
-    { id: 63, category_id: 4, subcategory_id: 401, name: "Улитка с сыром", article: "918151", weight: 115, price_per_unit: 46.00, units_per_pack: 40, price_per_pack: 1840.00, storage_period: "6 мес.", technology: "RST", available_units: 12 },
-
-    // Тречча (АКЦИЯ)
-    { id: 64, category_id: 4, subcategory_id: 402, name: "Тречча с миндальной начинкой", article: "742245", weight: 85, price_per_unit: 50.10, units_per_pack: 30, price_per_pack: 1503.00, storage_period: "6 мес.", technology: "RST", available_units: 20 },
-
-    // Тречча (готовая) (АКЦИЯ)
-    { id: 65, category_id: 4, subcategory_id: 403, name: "Тречча с миндальной начинкой", article: "742105", weight: 75, price_per_unit: 57.30, units_per_pack: 20, price_per_pack: 1146.00, storage_period: "6 мес.", technology: "RD", available_units: 15 },
-    { id: 66, category_id: 4, subcategory_id: 403, name: "Тречча «Солёная карамель»", article: "742101", weight: 75, price_per_unit: 40.16, units_per_pack: 20, price_per_pack: 803.20, storage_period: "6 мес.", technology: "RD", available_units: 10 },
-    { id: 67, category_id: 4, subcategory_id: 403, name: "Тречча «Сахарная вишня»", article: "742103", weight: 75, price_per_unit: 37.06, units_per_pack: 20, price_per_pack: 741.20, storage_period: "6 мес.", technology: "RD", available_units: 12 },
-
-    // Кленовый пекан (готовый)
-    { id: 68, category_id: 4, subcategory_id: 404, name: "Кленовый пекан (готовый, в ИУ)", article: "742104", weight: 75, price_per_unit: 65.00, units_per_pack: 20, price_per_pack: 1300.00, storage_period: "6 мес.", technology: "RD", available_units: 15 },
-
-    // Кленовый пекан
-    { id: 69, category_id: 4, subcategory_id: 405, name: "Кленовый пекан (п/ф, для выпечки)", article: "742295", weight: 85, price_per_unit: 60.93, units_per_pack: 30, price_per_pack: 1827.90, storage_period: "6 мес.", technology: "RST", available_units: 10 },
-
-    // Слойки сладкие
-    { id: 70, category_id: 4, subcategory_id: 406, name: "Слойка с вишней", article: "742231", weight: 90, price_per_unit: 31.46, units_per_pack: 50, price_per_pack: 1573.00, storage_period: "6 мес.", technology: "RST", available_units: 20 },
-    { id: 71, category_id: 4, subcategory_id: 406, name: "Слойка с абрикосом", article: "742244", weight: 90, price_per_unit: 26.71, units_per_pack: 50, price_per_pack: 1335.50, storage_period: "6 мес.", technology: "RST", available_units: 15 },
-    { id: 72, category_id: 4, subcategory_id: 406, name: "Слойка с клубникой", article: "742208", weight: 90, price_per_unit: 29.70, units_per_pack: 50, price_per_pack: 1485.00, storage_period: "6 мес.", technology: "RST", available_units: 10 },
-    { id: 73, category_id: 4, subcategory_id: 406, name: "Слойка с лимоном (Дениш-конверт)", article: "742215", weight: 90, price_per_unit: 28.55, units_per_pack: 50, price_per_pack: 1427.50, storage_period: "6 мес.", technology: "RST", available_units: 12 },
-    { id: 74, category_id: 4, subcategory_id: 406, name: "Слойка с малиной", article: "742217", weight: 90, price_per_unit: 35.86, units_per_pack: 50, price_per_pack: 1793.00, storage_period: "6 мес.", technology: "RST", available_units: 18 },
-    { id: 75, category_id: 4, subcategory_id: 406, name: "Слойка с творогом", article: "742249", weight: 90, price_per_unit: 28.06, units_per_pack: 50, price_per_pack: 1403.00, storage_period: "6 мес.", technology: "RST", available_units: 14 },
-    { id: 76, category_id: 4, subcategory_id: 406, name: "Слойка с яблоком", article: "742228", weight: 90, price_per_unit: 26.73, units_per_pack: 50, price_per_pack: 1336.50, storage_period: "6 мес.", technology: "RST", available_units: 16 },
-
-    // Слойки сытные
-    { id: 77, category_id: 4, subcategory_id: 407, name: "Слойка с капустой и яйцом", article: "742239", weight: 90, price_per_unit: 25.32, units_per_pack: 50, price_per_pack: 1266.00, storage_period: "6 мес.", technology: "RST", available_units: 20 },
-    { id: 78, category_id: 4, subcategory_id: 407, name: "Слойка с мясом", article: "742251", weight: 90, price_per_unit: 38.48, units_per_pack: 50, price_per_pack: 1924.00, storage_period: "6 мес.", technology: "RST", available_units: 15 },
-    { id: 79, category_id: 4, subcategory_id: 407, name: "Слойка с курицей и грибами", article: "742213", weight: 90, price_per_unit: 42.20, units_per_pack: 50, price_per_pack: 2110.00, storage_period: "6 мес.", technology: "RST", available_units: 10 },
-    { id: 80, category_id: 4, subcategory_id: 407, name: "Слойка с ветчиной и сыром (книжка)", article: "742238", weight: 90, price_per_unit: 36.00, units_per_pack: 50, price_per_pack: 1800.00, storage_period: "6 мес.", technology: "RST", available_units: 12 },
-    { id: 81, category_id: 4, subcategory_id: 407, name: "Слойка с курицей и сыром", article: "742246", weight: 90, price_per_unit: 40.94, units_per_pack: 50, price_per_pack: 2047.00, storage_period: "6 мес.", technology: "RST", available_units: 18 },
-    { id: 82, category_id: 4, subcategory_id: 407, name: "Слойка с сыром", article: "742248", weight: 90, price_per_unit: 33.80, units_per_pack: 50, price_per_pack: 1690.00, storage_period: "6 мес.", technology: "RST", available_units: 14 },
-    { id: 83, category_id: 4, subcategory_id: 407, name: "Слойка с сосиской", article: "742252", weight: 110, price_per_unit: 49.14, units_per_pack: 50, price_per_pack: 2457.00, storage_period: "6 мес.", technology: "RST", available_units: 16 },
-    { id: 84, category_id: 4, subcategory_id: 407, name: "Слойка с Баварской сосиской", article: "742274", weight: 140, price_per_unit: 74.70, units_per_pack: 30, price_per_pack: 2241.00, storage_period: "6 мес.", technology: "RST", available_units: 20 },
-
-    // Розаны (АКЦИЯ)
-    { id: 85, category_id: 4, subcategory_id: 408, name: "Розан с абрикосом и ванильным кремом", article: "755326", weight: 110, price_per_unit: 28.60, units_per_pack: 50, price_per_pack: 1430.00, storage_period: "6 мес.", technology: "RST", available_units: 20 },
-    { id: 86, category_id: 4, subcategory_id: 408, name: "Розан с ветчиной и белым соусом", article: "755333", weight: 120, price_per_unit: 42.65, units_per_pack: 50, price_per_pack: 2132.50, storage_period: "6 мес.", technology: "RST", available_units: 15 },
-    { id: 87, category_id: 4, subcategory_id: 408, name: "Розан с картофелем, беконом и шпинатным соусом", article: "755332", weight: 120, price_per_unit: 38.92, units_per_pack: 50, price_per_pack: 1946.00, storage_period: "6 мес.", technology: "RST", available_units: 10 },
-    { id: 88, category_id: 4, subcategory_id: 408, name: "Розан с картофелем, беконом и розовым соусом", article: "755331", weight: 120, price_per_unit: 38.92, units_per_pack: 50, price_per_pack: 1946.00, storage_period: "6 мес.", technology: "RST", available_units: 12 },
-    { id: 89, category_id: 4, subcategory_id: 408, name: "Розан с вишнёвой начинкой", article: "755330", weight: 110, price_per_unit: 32.49, units_per_pack: 50, price_per_pack: 1624.50, storage_period: "6 мес.", technology: "RST", available_units: 18 },
-    { id: 90, category_id: 4, subcategory_id: 408, name: "Розан со смородиной и ванильным кремом", article: "755327", weight: 110, price_per_unit: 40.62, units_per_pack: 50, price_per_pack: 2031.00, storage_period: "6 мес.", technology: "RST", available_units: 14 },
-
-    // Штрудели
-    { id: 91, category_id: 4, subcategory_id: 409, name: "Штрудель с вишней", article: "741051", weight: 150, price_per_unit: 54.17, units_per_pack: 30, price_per_pack: 1625.10, storage_period: "6 мес.", technology: "RST", available_units: 20 },
-    { id: 92, category_id: 4, subcategory_id: 409, name: "Штрудель с яблоком", article: "741052", weight: 150, price_per_unit: 50.10, units_per_pack: 30, price_per_pack: 1503.00, storage_period: "6 мес.", technology: "RST", available_units: 15 },
-    { id: 93, category_id: 4, subcategory_id: 409, name: "Штрудель с ветчиной и сыром", article: "741050", weight: 150, price_per_unit: 80.82, units_per_pack: 30, price_per_pack: 2424.60, storage_period: "6 мес.", technology: "RST", available_units: 10 },
-    { id: 94, category_id: 4, subcategory_id: 409, name: "Штрудель со шпинатом и сыром", article: "741057", weight: 150, price_per_unit: 62.47, units_per_pack: 30, price_per_pack: 1874.10, storage_period: "6 мес.", technology: "RST", available_units: 12 },
-    { id: 95, category_id: 4, subcategory_id: 409, name: "Штрудель с курицей", article: "741064", weight: 150, price_per_unit: 74.23, units_per_pack: 30, price_per_pack: 2226.90, storage_period: "6 мес.", technology: "RST", available_units: 18 },
-    { id: 96, category_id: 4, subcategory_id: 409, name: "Штрудель с мясом", article: "741063", weight: 150, price_per_unit: 76.13, units_per_pack: 30, price_per_pack: 2283.90, storage_period: "6 мес.", technology: "RST", available_units: 14 },
-
-    // Хачапури (бездрожжевое)
-    { id: 97, category_id: 4, subcategory_id: 410, name: "Хачапури с сыром и базиликом", article: "741061", weight: 100, price_per_unit: 41.60, units_per_pack: 25, price_per_pack: 1040.00, storage_period: "6 мес.", technology: "RST", available_units: 20 },
-    { id: 98, category_id: 4, subcategory_id: 410, name: "Хачапури с ветчиной и сыром", article: "741001", weight: 130, price_per_unit: 54.00, units_per_pack: 25, price_per_pack: 1350.00, storage_period: "6 мес.", technology: "RST", available_units: 15 },
-    { id: 99, category_id: 4, subcategory_id: 410, name: "Хачапури с курицей и сыром", article: "741002", weight: 130, price_per_unit: 60.16, units_per_pack: 25, price_per_pack: 1504.00, storage_period: "6 мес.", technology: "RD", available_units: 10 },
-    { id: 100, category_id: 4, subcategory_id: 410, name: "Хачапури с салями, грибами и сливочным соусом", article: "741003", weight: 130, price_per_unit: 60.60, units_per_pack: 25, price_per_pack: 1515.00, storage_period: "6 мес.", technology: "RD", available_units: 12 },
-    { id: 101, category_id: 4, subcategory_id: 410, name: "Хачапури с салями, грибами и томатным соусом", article: "741004", weight: 130, price_per_unit: 57.20, units_per_pack: 25, price_per_pack: 1430.00, storage_period: "6 мес.", technology: "RD", available_units: 18 },
-
-    // Беляши (готовые)
-    { id: 102, category_id: 10, subcategory_id: 1001, name: "Беляш с мясом", article: "742401", weight: 140, price_per_unit: 53.99, units_per_pack: 25, price_per_pack: 1349.75, storage_period: "6 мес.", technology: "RD", available_units: 20 },
-    { id: 103, category_id: 10, subcategory_id: 1001, name: "Беляш жареный с мясом", article: "912607", weight: 140, price_per_unit: 53.99, units_per_pack: 40, price_per_pack: 2159.60, storage_period: "6 мес.", technology: "RD", available_units: 15 },
-
-    // Чебуреки (готовые)
-    { id: 104, category_id: 10, subcategory_id: 1002, name: "Чебурек жареный с говядиной", article: "912604", weight: 140, price_per_unit: 51.04, units_per_pack: 40, price_per_pack: 2041.60, storage_period: "6 мес.", technology: "RD", available_units: 10 },
-
-    // Американское печенье «Кукис» с полезными свойствами (готовое)
-    { id: 105, category_id: 11, subcategory_id: 1101, name: "Кукис сливочный с семенами Чиа", article: "300314", weight: 70, price_per_unit: 44.77, units_per_pack: 30, price_per_pack: 1343.10, storage_period: "6 мес.", technology: "RD", available_units: 20 },
-    { id: 106, category_id: 11, subcategory_id: 1101, name: "Кукис злаковый «Фитнес»", article: "300305", weight: 70, price_per_unit: 63.10, units_per_pack: 30, price_per_pack: 1893.00, storage_period: "6 мес.", technology: "RD", available_units: 15 },
-
-    // Американское печенье «Кукис» классическое (готовое)
-    { id: 107, category_id: 11, subcategory_id: 1102, name: "Кукис сливочный с шоколадом", article: "300307", weight: 70, price_per_unit: 60.03, units_per_pack: 30, price_per_pack: 1800.90, storage_period: "6 мес.", technology: "RD", available_units: 10 },
-    { id: 108, category_id: 11, subcategory_id: 1102, name: "Кукис шоколадный с шоколадными каплями", article: "300304", weight: 70, price_per_unit: 67.17, units_per_pack: 30, price_per_pack: 2015.10, storage_period: "6 мес.", technology: "RD", available_units: 12 },
-
-    // Вупи Пай (готовый)
-    { id: 109, category_id: 11, subcategory_id: 1103, name: "Вупи Пай «Классический»", article: "911429", weight: 75, price_per_unit: 77.11, units_per_pack: 9, price_per_pack: 693.99, storage_period: "6 мес.", technology: "RD", available_units: 18 },
-    { id: 110, category_id: 11, subcategory_id: 1103, name: "Вупи Пай «Карамельный»", article: "911428", weight: 75, price_per_unit: 77.11, units_per_pack: 9, price_per_pack: 693.99, storage_period: "6 мес.", technology: "RD", available_units: 14 },
-    { id: 111, category_id: 11, subcategory_id: 1103, name: "Вупи Пай «Кокосовый»", article: "911430", weight: 75, price_per_unit: 77.11, units_per_pack: 9, price_per_pack: 693.99, storage_period: "6 мес.", technology: "RD", available_units: 16 },
-    { id: 112, category_id: 11, subcategory_id: 1103, name: "Вупи Пай «Матча»", article: "911431", weight: 75, price_per_unit: 77.11, units_per_pack: 9, price_per_pack: 693.99, storage_period: "6 мес.", technology: "RD", available_units: 20 },
-    { id: 113, category_id: 11, subcategory_id: 1103, name: "Вупи Пай «Шоколад-Банан»", article: "911432", weight: 75, price_per_unit: 77.11, units_per_pack: 9, price_per_pack: 693.99, storage_period: "6 мес.", technology: "RD", available_units: 15 },
-    { id: 114, category_id: 11, subcategory_id: 1103, name: "Вупи Пай «Ягодный»", article: "911433", weight: 75, price_per_unit: 77.11, units_per_pack: 9, price_per_pack: 693.99, storage_period: "6 мес.", technology: "RD", available_units: 10 },
-
-    // Кексы (готовые)
-    { id: 115, category_id: 11, subcategory_id: 1104, name: "Кекс «Мраморный» (10 порций по 80 гр.)", article: "742373", weight: 800, price_per_unit: 390.72, units_per_pack: 3, price_per_pack: 1172.16, storage_period: "6 мес.", technology: "RD", available_units: 12 },
-    { id: 116, category_id: 11, subcategory_id: 1104, name: "Кекс с маком (10 порций по 80 гр.)", article: "742374", weight: 800, price_per_unit: 431.57, units_per_pack: 3, price_per_pack: 1294.71, storage_period: "6 мес.", technology: "RD", available_units: 18 },
-    { id: 117, category_id: 11, subcategory_id: 1104, name: "Кекс шоколадный с клюквой (10 порций по 80 гр.)", article: "742375", weight: 800, price_per_unit: 499.47, units_per_pack: 3, price_per_pack: 1498.41, storage_period: "6 мес.", technology: "RD", available_units: 14 },
-    { id: 118, category_id: 11, subcategory_id: 1104, name: "Кекс сливочный с изюмом (10 порций по 80 гр.)", article: "742376", weight: 800, price_per_unit: 414.06, units_per_pack: 3, price_per_pack: 1242.18, storage_period: "6 мес.", technology: "RD", available_units: 16 },
-    { id: 119, category_id: 11, subcategory_id: 1104, name: "Кекс «Морковный» (10 порций по 80 гр.)", article: "742372", weight: 800, price_per_unit: 410.54, units_per_pack: 3, price_per_pack: 1231.62, storage_period: "6 мес.", technology: "RD", available_units: 20 },
-    { id: 120, category_id: 11, subcategory_id: 1104, name: "Кекс «Морковный»", article: "911420", weight: 85, price_per_unit: 48.17, units_per_pack: 24, price_per_pack: 1156.08, storage_period: "6 мес.", technology: "RD", available_units: 15 },
-
-    // Штрудели (готовые)
-    { id: 121, category_id: 11, subcategory_id: 1105, name: "Штрудель «Австрийский» вишневый (постное/вегетарианское)", article: "910042", weight: 150, price_per_unit: 119.60, units_per_pack: 16, price_per_pack: 1913.60, storage_period: "6 мес.", technology: "RD", available_units: 10 },
-    { id: 122, category_id: 11, subcategory_id: 1105, name: "Штрудель «Австрийский» маковый (постное/вегетарианское)", article: "910044", weight: 150, price_per_unit: 115.40, units_per_pack: 16, price_per_pack: 1846.40, storage_period: "6 мес.", technology: "RD", available_units: 12 },
-    { id: 123, category_id: 11, subcategory_id: 1105, name: "Штрудель «Австрийский» яблочный (постное/вегетарианское)", article: "910045", weight: 150, price_per_unit: 97.20, units_per_pack: 16, price_per_pack: 1555.20, storage_period: "6 мес.", technology: "RD", available_units: 18 },
-
-    // Ромовая баба (готовая)
-    { id: 124, category_id: 11, subcategory_id: 1106, name: "Ромовая баба со сливочной помадкой", article: "773108", weight: 90, price_per_unit: 61.80, units_per_pack: 20, price_per_pack: 1236.00, storage_period: "6 мес.", technology: "RD", available_units: 14 },
-
-    // Брауни (готовый)
-    { id: 125, category_id: 11, subcategory_id: 1107, name: "Брауни с соленой карамелью", article: "742371", weight: 90, price_per_unit: 104.99, units_per_pack: 30, price_per_pack: 3149.70, storage_period: "6 мес.", technology: "RD", available_units: 16 },
-    { id: 126, category_id: 11, subcategory_id: 1107, name: "Брауни с халвовым муссом, карамелью и шоколадом", article: "911422", weight: 110, price_per_unit: 89.11, units_per_pack: 9, price_per_pack: 801.99, storage_period: "6 мес.", technology: "RD", available_units: 20 },
-    { id: 127, category_id: 11, subcategory_id: 1107, name: "Брауни шоколадный", article: "310303", weight: 80, price_per_unit: 60.71, units_per_pack: 24, price_per_pack: 1457.04, storage_period: "6 мес.", technology: "RD", available_units: 15 },
-
-    // Тарталетки (готовые)
-    { id: 128, category_id: 11, subcategory_id: 1108, name: "Тарталетка «Фисташковая»", article: "919423", weight: 110, price_per_unit: 176.00, units_per_pack: 9, price_per_pack: 1584.00, storage_period: "6 мес.", technology: "RD", available_units: 10 },
-    { id: 129, category_id: 11, subcategory_id: 1108, name: "Тарталетка «Ягодная со смородиной»", article: "919424", weight: 120, price_per_unit: 152.33, units_per_pack: 9, price_per_pack: 1370.97, storage_period: "6 мес.", technology: "RD", available_units: 12 },
-    { id: 130, category_id: 11, subcategory_id: 1108, name: "Пирожные ассорти «Тарты по-французски с заварным кремом»", article: "918080", weight: 70, price_per_unit: 61.60, units_per_pack: 32, price_per_pack: 1971.20, storage_period: "6 мес.", technology: "RD", available_units: 18 },
-    { id: 131, category_id: 11, subcategory_id: 1108, name: "Корзиночка ягодная 130 г (Бенье)", article: "918130", weight: 130, price_per_unit: 116.50, units_per_pack: 20, price_per_pack: 2330.00, storage_period: "6 мес.", technology: "RD", available_units: 14 },
-    { id: 132, category_id: 11, subcategory_id: 1108, name: "Тарталетка «Карамельно-ореховая»", article: "918026", weight: 95, price_per_unit: 152.33, units_per_pack: 9, price_per_pack: 1370.97, storage_period: "6 мес.", technology: "RD", available_units: 16 },
-    { id: 133, category_id: 11, subcategory_id: 1108, name: "Тарталетка «Малиновая»", article: "918027", weight: 110, price_per_unit: 176.00, units_per_pack: 9, price_per_pack: 1584.00, storage_period: "6 мес.", technology: "RD", available_units: 20 },
-
-    // Паштел-де-ната (АКЦИЯ)
-    { id: 134, category_id: 11, subcategory_id: 1109, name: "Пирожное «Паштел-де-ната»", article: "919420", weight: 52, price_per_unit: 33.00, units_per_pack: 45, price_per_pack: 1485.00, storage_period: "6 мес.", technology: "RST", available_units: 15 },
-
-    // Донатсы Ассорти (готовые)
-    { id: 135, category_id: 11, subcategory_id: 1110, name: "Донатсы Ассорти №1: солёная карамель, вишня, банан, черника", article: "910101", weight: 80, price_per_unit: 48.40, units_per_pack: 20, price_per_pack: 968.00, storage_period: "6 мес.", technology: "RD", available_units: 10 },
-    { id: 136, category_id: 11, subcategory_id: 1110, name: "Донатсы Ассорти №2: ваниль, шоколад, клубника, лесные ягоды", article: "910102", weight: 80, price_per_unit: 48.40, units_per_pack: 20, price_per_pack: 968.00, storage_period: "6 мес.", technology: "RD", available_units: 12 },
-    { id: 137, category_id: 11, subcategory_id: 1110, name: "Донатсы Ассорти №3: фисташка, тирамису, манго, кокос", article: "910103", weight: 80, price_per_unit: 48.40, units_per_pack: 20, price_per_pack: 968.00, storage_period: "6 мес.", technology: "RD", available_units: 18 },
-
-    // Донатсы с начинкой (готовые) (АКЦИЯ)
-    { id: 138, category_id: 11, subcategory_id: 1111, name: "Донатс «Карамельный» Bakerton", article: "912208", weight: 67, price_per_unit: 45.67, units_per_pack: 36, price_per_pack: 1644.20, storage_period: "6 мес.", technology: "RD", available_units: 14 },
-    { id: 139, category_id: 11, subcategory_id: 1111, name: "Донатс «Клубничный» Mama Vera", article: "910109", weight: 80, price_per_unit: 48.40, units_per_pack: 28, price_per_pack: 1355.20, storage_period: "6 мес.", technology: "RD", available_units: 16 },
-    { id: 140, category_id: 11, subcategory_id: 1111, name: "Донатс «Ванильный» Mama Vera", article: "910108", weight: 80, price_per_unit: 48.40, units_per_pack: 28, price_per_pack: 1355.20, storage_period: "6 мес.", technology: "RD", available_units: 20 },
-    { id: 141, category_id: 11, subcategory_id: 1111, name: "Донатс «Солёная карамель» Mama Vera", article: "910107", weight: 80, price_per_unit: 48.40, units_per_pack: 28, price_per_pack: 1355.20, storage_period: "6 мес.", technology: "RD", available_units: 15 },
-
-    // Кейк - Попсы (готовые)
-    { id: 142, category_id: 11, subcategory_id: 1112, name: "Кейк-Попс «Фирменный», ассорти (Лесные ягоды, Апельсин-манго, Шоколад)", article: "918099", weight: 60, price_per_unit: 89.20, units_per_pack: 48, price_per_pack: 4281.60, storage_period: "6 мес.", technology: "RD", available_units: 10 },
-    { id: 143, category_id: 11, subcategory_id: 1112, name: "Шоубокс для кейк-попсов", article: "120157", weight: 0, price_per_unit: 50.00, units_per_pack: 1, price_per_pack: 50.00, storage_period: "6 мес.", technology: "", available_units: 12 },
-    { id: 144, category_id: 11, subcategory_id: 1113, name: "Ассорти «Макарунс» 5 вкусов (кокос, апельсин, мята, клубника, трюфель), ⌀ 5-6 см", article: "918052", weight: 25, price_per_unit: 41.00, units_per_pack: 25, price_per_pack: 1025.00, storage_period: "6 мес.", technology: "RD", available_units: 10 },
-    { id: 145, category_id: 11, subcategory_id: 1113, name: "Ассорти «Макарунс» №1, 4 вкуса (Коксовый рай, Малина, Банановый милкшейк, Лесной орех)", article: "912233", weight: 20, price_per_unit: 50.80, units_per_pack: 36, price_per_pack: 1828.80, storage_period: "6 мес.", technology: "RD", available_units: 12 },
-    { id: 146, category_id: 11, subcategory_id: 1113, name: "Ассорти «Макарунс» №2.1, 4 вкуса (Манго-Маракуйя, Мята, Пряная вишня, Солёная карамель)", article: "912235", weight: 20, price_per_unit: 50.80, units_per_pack: 36, price_per_pack: 1828.80, storage_period: "6 мес.", technology: "RD", available_units: 15 },
-    { id: 147, category_id: 11, subcategory_id: 1113, name: "Ассорти «Макарунс» №3, 4 вкуса (Фисташка, Апельсин, Лимон, Смородина)", article: "912231", weight: 20, price_per_unit: 50.80, units_per_pack: 36, price_per_pack: 1828.80, storage_period: "6 мес.", technology: "RD", available_units: 18 },
-
-    // Чизкейки классические (готовые) - Кондитерские изделия
-    { id: 148, category_id: 12, subcategory_id: 1201, name: "Чизкейк «Карамель и орех»", article: "917611", weight: 125, price_per_unit: 130.90, units_per_pack: 16, price_per_pack: 2094.40, storage_period: "6 мес.", technology: "RD", available_units: 10 },
-    { id: 149, category_id: 12, subcategory_id: 1201, name: "Чизкейк «Тропический»", article: "917612", weight: 125, price_per_unit: 130.90, units_per_pack: 16, price_per_pack: 2094.40, storage_period: "6 мес.", technology: "RD", available_units: 12 },
-    { id: 150, category_id: 12, subcategory_id: 1201, name: "Чизкейк «Шоколадный микс»", article: "917609", weight: 125, price_per_unit: 130.90, units_per_pack: 16, price_per_pack: 2094.40, storage_period: "6 мес.", technology: "RD", available_units: 15 },
-    { id: 151, category_id: 12, subcategory_id: 1201, name: "Чизкейк «Вишня и шоколад»", article: "917607", weight: 125, price_per_unit: 135.70, units_per_pack: 16, price_per_pack: 2171.20, storage_period: "6 мес.", technology: "RD", available_units: 18 },
-    { id: 152, category_id: 12, subcategory_id: 1201, name: "Чизкейк «Кленовый пecan» (творожное суфле)", article: "919218", weight: 100, price_per_unit: 91.17, units_per_pack: 12, price_per_pack: 1094.04, storage_period: "6 мес.", technology: "RD", available_units: 10 },
-    { id: 153, category_id: 12, subcategory_id: 1201, name: "Чизкейк «Шоколадный» (творожное суфле)", article: "919219", weight: 100, price_per_unit: 87.50, units_per_pack: 12, price_per_pack: 1050.00, storage_period: "6 мес.", technology: "RD", available_units: 12 },
-    { id: 154, category_id: 12, subcategory_id: 1201, name: "Чизкейк «Фисташковый» (творожное суфле)", article: "919217", weight: 100, price_per_unit: 87.50, units_per_pack: 12, price_per_pack: 1050.00, storage_period: "6 мес.", technology: "RD", available_units: 15 },
-    { id: 155, category_id: 12, subcategory_id: 1201, name: "Чизкейк «New York» с клубникой (творожное суфле)", article: "919216", weight: 100, price_per_unit: 77.08, units_per_pack: 12, price_per_pack: 924.96, storage_period: "6 мес.", technology: "RD", available_units: 18 },
-    { id: 156, category_id: 12, subcategory_id: 1201, name: "Чизкейк «New York» (творожное суфле)", article: "919215", weight: 100, price_per_unit: 77.08, units_per_pack: 12, price_per_pack: 924.96, storage_period: "6 мес.", technology: "RD", available_units: 10 },
-    { id: 157, category_id: 12, subcategory_id: 1201, name: "Чизкейк «New York» (Гурманов)", article: "917601", weight: 125, price_per_unit: 115.30, units_per_pack: 16, price_per_pack: 1844.80, storage_period: "6 мес.", technology: "RD", available_units: 12 },
-    { id: 158, category_id: 12, subcategory_id: 1201, name: "Чизкейки круглые «Ассорти» 4 вкуса: вишня, карамель, классический, манго-маракуйя (⌀ 7 см)", article: "911426", weight: 120, price_per_unit: 101.19, units_per_pack: 16, price_per_pack: 1619.04, storage_period: "6 мес.", technology: "RD", available_units: 15 },
-    { id: 159, category_id: 12, subcategory_id: 1201, name: "Чизкейк «Ассорти» 8 вкусов: шоколад, карамель, вишня, Нью-Йорк, клубника, фисташка и малина, тропический с манго и чиа, кокос", article: "917610", weight: 125, price_per_unit: 150.90, units_per_pack: 16, price_per_pack: 2414.40, storage_period: "6 мес.", technology: "RD", available_units: 18 },
-
-    // Пироги (тарты) порционные - Кондитерские изделия
-    { id: 160, category_id: 12, subcategory_id: 1202, name: "Пирог «Лимонный»", article: "919220", weight: 100, price_per_unit: 96.58, units_per_pack: 12, price_per_pack: 1158.96, storage_period: "6 мес.", technology: "RD", available_units: 10 },
-    { id: 161, category_id: 12, subcategory_id: 1202, name: "Пирог «Вишневый»", article: "919225", weight: 100, price_per_unit: 96.58, units_per_pack: 12, price_per_pack: 1158.96, storage_period: "6 мес.", technology: "RD", available_units: 12 },
-    { id: 162, category_id: 12, subcategory_id: 1202, name: "Пирог «Клубничный»", article: "919226", weight: 100, price_per_unit: 96.58, units_per_pack: 12, price_per_pack: 1158.96, storage_period: "6 мес.", technology: "RD", available_units: 15 },
-
-    // Порционные торты (готовые) (АКЦИЯ) - Кондитерские изделия
-    { id: 163, category_id: 12, subcategory_id: 1203, name: "Порционный торт «Медовик» (Чизберри)", article: "919222", weight: 116, price_per_unit: 106.25, units_per_pack: 12, price_per_pack: 1275.00, storage_period: "6 мес.", technology: "RD", available_units: 18 },
-    { id: 164, category_id: 12, subcategory_id: 1203, name: "Порционный торт «Медовик» (Эдельвейс)", article: "920053", weight: 140, price_per_unit: 110.50, units_per_pack: 12, price_per_pack: 1326.00, storage_period: "6 мес.", technology: "RD", available_units: 10 },
-    { id: 165, category_id: 12, subcategory_id: 1203, name: "Порционный торт «Наполеон» (120 гр.)", article: "918071", weight: 120, price_per_unit: 122.40, units_per_pack: 10, price_per_pack: 1224.00, storage_period: "6 мес.", technology: "RD", available_units: 12 },
-    { id: 166, category_id: 12, subcategory_id: 1203, name: "Порционный торт «Наполеон» (150 гр.)", article: "918065", weight: 150, price_per_unit: 142.60, units_per_pack: 9, price_per_pack: 1283.40, storage_period: "6 мес.", technology: "RD", available_units: 15 },
-    { id: 167, category_id: 12, subcategory_id: 1203, name: "Порционный торт «Красный бархат»", article: "920031", weight: 120, price_per_unit: 107.90, units_per_pack: 12, price_per_pack: 1294.80, storage_period: "6 мес.", technology: "RD", available_units: 18 },
-    { id: 168, category_id: 12, subcategory_id: 1203, name: "Порционный торт «Графские развалины»", article: "918066", weight: 100, price_per_unit: 135.80, units_per_pack: 12, price_per_pack: 1629.60, storage_period: "6 мес.", technology: "RD", available_units: 10 },
-    { id: 169, category_id: 12, subcategory_id: 1203, name: "Порционный торт «Рикотта с грушей»", article: "919051", weight: 108, price_per_unit: 135.90, units_per_pack: 12, price_per_pack: 1630.80, storage_period: "6 мес.", technology: "RD", available_units: 12 },
-    { id: 170, category_id: 12, subcategory_id: 1203, name: "Порционный торт «Захер»", article: "920054", weight: 110, price_per_unit: 113.50, units_per_pack: 12, price_per_pack: 1362.00, storage_period: "6 мес.", technology: "RD", available_units: 15 },
-    { id: 171, category_id: 12, subcategory_id: 1203, name: "Порционный торт «Морковный»", article: "920061", weight: 100, price_per_unit: 104.90, units_per_pack: 12, price_per_pack: 1258.80, storage_period: "6 мес.", technology: "RD", available_units: 18 },
-    { id: 172, category_id: 12, subcategory_id: 1203, name: "Порционный муссовый торт «Три шоколада»", article: "920033", weight: 100, price_per_unit: 153.10, units_per_pack: 12, price_per_pack: 1837.20, storage_period: "6 мес.", technology: "RD", available_units: 10 },
-    { id: 173, category_id: 12, subcategory_id: 1203, name: "Порционный бисквитный торт «Три шоколада»", article: "920055", weight: 100, price_per_unit: 141.00, units_per_pack: 12, price_per_pack: 1692.00, storage_period: "6 мес.", technology: "RD", available_units: 12 },
-    { id: 174, category_id: 12, subcategory_id: 1203, name: "Порционный торт «Прага»", article: "919272", weight: 114, price_per_unit: 106.90, units_per_pack: 14, price_per_pack: 1496.60, storage_period: "6 мес.", technology: "RD", available_units: 15 },
-    { id: 175, category_id: 12, subcategory_id: 1203, name: "Порционный торт «Тирамису»", article: "919271", weight: 114, price_per_unit: 114.90, units_per_pack: 14, price_per_pack: 1608.60, storage_period: "6 мес.", technology: "RD", available_units: 18 },
-    { id: 176, category_id: 12, subcategory_id: 1203, name: "Торт «Брусничный» с белым шоколадом (ДФ)", article: "918041", weight: 125, price_per_unit: 161.33, units_per_pack: 12, price_per_pack: 1935.96, storage_period: "6 мес.", technology: "RD", available_units: 10 },
-
-    // Пирожные (готовые) - Кондитерские изделия
-    { id: 177, category_id: 12, subcategory_id: 1204, name: "Пирожное «Картошка с клубникой» (3 шт в коррексе)", article: "912220", weight: 50, price_per_unit: 38.30, units_per_pack: 72, price_per_pack: 2757.60, storage_period: "6 мес.", technology: "RD", available_units: 12 },
-    { id: 178, category_id: 12, subcategory_id: 1204, name: "Пирожное «Картошка» (60 гр.)", article: "919410", weight: 60, price_per_unit: 42.00, units_per_pack: 31, price_per_pack: 1302.00, storage_period: "6 мес.", technology: "RD", available_units: 15 },
-    { id: 179, category_id: 12, subcategory_id: 1204, name: "Пирожное «Картошка» (70 гр.)", article: "912207", weight: 70, price_per_unit: 37.00, units_per_pack: 96, price_per_pack: 3552.00, storage_period: "6 мес.", technology: "RD", available_units: 18 },
-    { id: 180, category_id: 12, subcategory_id: 1204, name: "Пирожные «Малина-Фисташка» в креманке", article: "918136", weight: 90, price_per_unit: 120.50, units_per_pack: 12, price_per_pack: 1446.00, storage_period: "6 мес.", technology: "RD", available_units: 10 },
-    { id: 181, category_id: 12, subcategory_id: 1204, name: "Пирожные «Манго-маракуйя» в креманке", article: "918110", weight: 90, price_per_unit: 120.50, units_per_pack: 12, price_per_pack: 1446.00, storage_period: "6 мес.", technology: "RD", available_units: 12 },
-    { id: 182, category_id: 12, subcategory_id: 1204, name: "Пирожные «Тирамису» в креманке", article: "918097", weight: 90, price_per_unit: 120.50, units_per_pack: 12, price_per_pack: 1446.00, storage_period: "6 мес.", technology: "RD", available_units: 15 },
-    { id: 183, category_id: 12, subcategory_id: 1204, name: "Кольцо с творожным кремом", article: "912213", weight: 50, price_per_unit: 40.70, units_per_pack: 36, price_per_pack: 1465.20, storage_period: "6 мес.", technology: "RD", available_units: 18 },
-
-    // Эклеры «Премиум» (готовые) - Кондитерские изделия
-    { id: 184, category_id: 12, subcategory_id: 1205, name: "Эклер Премиум «Шоколадный»", article: "912224", weight: 50, price_per_unit: 104.50, units_per_pack: 10, price_per_pack: 1045.00, storage_period: "6 мес.", technology: "RD", available_units: 10 },
-    { id: 185, category_id: 12, subcategory_id: 1205, name: "Эклер Премиум «Смородиновый»", article: "912225", weight: 50, price_per_unit: 104.50, units_per_pack: 10, price_per_pack: 1045.00, storage_period: "6 мес.", technology: "RD", available_units: 12 },
-    { id: 186, category_id: 12, subcategory_id: 1205, name: "Эклер Премиум «Манго»", article: "912226", weight: 50, price_per_unit: 104.50, units_per_pack: 10, price_per_pack: 1045.00, storage_period: "6 мес.", technology: "RD", available_units: 15 },
-    { id: 187, category_id: 12, subcategory_id: 1205, name: "Эклер Премиум «Вишневый»", article: "912227", weight: 50, price_per_unit: 104.50, units_per_pack: 10, price_per_pack: 1045.00, storage_period: "6 мес.", technology: "RD", available_units: 18 },
-    { id: 188, category_id: 12, subcategory_id: 1205, name: "Эклер Премиум «Карамельный»", article: "912228", weight: 50, price_per_unit: 104.50, units_per_pack: 10, price_per_pack: 1045.00, storage_period: "6 мес.", technology: "RD", available_units: 10 },
-    { id: 189, category_id: 12, subcategory_id: 1205, name: "Эклер Премиум «Ванильный»", article: "912229", weight: 50, price_per_unit: 104.50, units_per_pack: 10, price_per_pack: 1045.00, storage_period: "6 мес.", technology: "RD", available_units: 12 },
-
-    // Эклеры классические (готовые) - Кондитерские изделия
-    { id: 190, category_id: 12, subcategory_id: 1206, name: "Эклер с фисташковым заварным кремом и малиной", article: "918131", weight: 47, price_per_unit: 48.30, units_per_pack: 40, price_per_pack: 1932.00, storage_period: "6 мес.", technology: "RD", available_units: 15 },
-    { id: 191, category_id: 12, subcategory_id: 1206, name: "Эклер «Груша-карамель»", article: "918138", weight: 47, price_per_unit: 42.90, units_per_pack: 40, price_per_pack: 1716.00, storage_period: "6 мес.", technology: "RD", available_units: 18 },
-    { id: 192, category_id: 12, subcategory_id: 1206, name: "Эклер «Рафаэлло»", article: "912243", weight: 60, price_per_unit: 76.70, units_per_pack: 12, price_per_pack: 920.40, storage_period: "6 мес.", technology: "RD", available_units: 10 },
-    { id: 193, category_id: 12, subcategory_id: 1206, name: "Эклер с сырным кремом", article: "912244", weight: 60, price_per_unit: 76.70, units_per_pack: 12, price_per_pack: 920.40, storage_period: "6 мес.", technology: "RD", available_units: 12 },
-    { id: 194, category_id: 12, subcategory_id: 1206, name: "Эклер «Шоколадный»", article: "912245", weight: 60, price_per_unit: 76.70, units_per_pack: 12, price_per_pack: 920.40, storage_period: "6 мес.", technology: "RD", available_units: 15 },
-    { id: 195, category_id: 12, subcategory_id: 1206, name: "Эклер «Ванильный» (Сладо)", article: "918132", weight: 60, price_per_unit: 74.60, units_per_pack: 10, price_per_pack: 746.00, storage_period: "6 мес.", technology: "RD", available_units: 18 },
-    { id: 196, category_id: 12, subcategory_id: 1206, name: "Эклер «Ванильный» (Бута)", article: "912239", weight: 60, price_per_unit: 68.30, units_per_pack: 12, price_per_pack: 819.60, storage_period: "6 мес.", technology: "RD", available_units: 10 },
-    { id: 197, category_id: 12, subcategory_id: 1206, name: "Эклер «Кокосовый»", article: "918133", weight: 60, price_per_unit: 71.50, units_per_pack: 10, price_per_pack: 715.00, storage_period: "6 мес.", technology: "RD", available_units: 12 },
-    { id: 198, category_id: 12, subcategory_id: 1206, name: "Эклер «Лимонный»", article: "918134", weight: 60, price_per_unit: 82.20, units_per_pack: 10, price_per_pack: 822.00, storage_period: "6 мес.", technology: "RD", available_units: 15 },
-    { id: 199, category_id: 12, subcategory_id: 1206, name: "Эклер заварной «Шоколадный»", article: "920076", weight: 60, price_per_unit: 82.50, units_per_pack: 10, price_per_pack: 825.00, storage_period: "6 мес.", technology: "RD", available_units: 18 },
-    { id: 200, category_id: 12, subcategory_id: 1206, name: "Эклер заварной «Ванильный»", article: "920074", weight: 60, price_per_unit: 87.00, units_per_pack: 10, price_per_pack: 870.00, storage_period: "6 мес.", technology: "RD", available_units: 10 },
-    { id: 201, category_id: 12, subcategory_id: 1206, name: "Эклер заварной «Глазированный»", article: "920075", weight: 60, price_per_unit: 102.00, units_per_pack: 10, price_per_pack: 1020.00, storage_period: "6 мес.", technology: "RD", available_units: 12 },
-    { id: 202, category_id: 12, subcategory_id: 1206, name: "Эклер обсыпной с вареной сгущенкой (Бута)", article: "912242", weight: 60, price_per_unit: 73.50, units_per_pack: 12, price_per_pack: 882.00, storage_period: "6 мес.", technology: "RD", available_units: 15 },
-    { id: 203, category_id: 12, subcategory_id: 1206, name: "Эклер с кремом из сгущёнки и ореховой обсыпкой (Эдельвейс)", article: "920064", weight: 60, price_per_unit: 72.00, units_per_pack: 10, price_per_pack: 720.00, storage_period: "6 мес.", technology: "RD", available_units: 18 },
-    { id: 204, category_id: 12, subcategory_id: 1206, name: "Эклер с заварным кремом", article: "918061", weight: 50, price_per_unit: 41.60, units_per_pack: 50, price_per_pack: 2080.00, storage_period: "6 мес.", technology: "RD", available_units: 10 },
-
-    // Вафельные трубочки (готовые) - Кондитерские изделия
-    { id: 205, category_id: 12, subcategory_id: 1207, name: "Трубочка с варёной сгущенкой", article: "918121", weight: 70, price_per_unit: 40.50, units_per_pack: 20, price_per_pack: 810.00, storage_period: "6 мес.", technology: "RD", available_units: 12 },
-    { id: 206, category_id: 12, subcategory_id: 1207, name: "Трубочка с варёной сгущенкой «Премиум»", article: "918090", weight: 75, price_per_unit: 63.30, units_per_pack: 30, price_per_pack: 1899.00, storage_period: "6 мес.", technology: "RD", available_units: 15 },
-    { id: 207, category_id: 12, subcategory_id: 1201, name: "Чизкейк «Карамель и орех»", article: "917611", weight: 125, price_per_unit: 130.90, units_per_pack: 16, price_per_pack: 2094.40, storage_period: "6 мес.", technology: "RD", available_units: 10 },
-    { id: 208, category_id: 12, subcategory_id: 1201, name: "Чизкейк «Тропический»", article: "917612", weight: 125, price_per_unit: 130.90, units_per_pack: 16, price_per_pack: 2094.40, storage_period: "6 мес.", technology: "RD", available_units: 12 },
-    { id: 209, category_id: 12, subcategory_id: 1201, name: "Чизкейк «Шоколадный микс»", article: "917609", weight: 125, price_per_unit: 130.90, units_per_pack: 16, price_per_pack: 2094.40, storage_period: "6 мес.", technology: "RD", available_units: 15 },
-    { id: 210, category_id: 12, subcategory_id: 1201, name: "Чизкейк «Вишня и шоколад»", article: "917607", weight: 125, price_per_unit: 135.70, units_per_pack: 16, price_per_pack: 2171.20, storage_period: "6 мес.", technology: "RD", available_units: 18 },
-    { id: 211, category_id: 12, subcategory_id: 1201, name: "Чизкейк «Кленовый пecan» (творожное суфле)", article: "919218", weight: 100, price_per_unit: 91.17, units_per_pack: 12, price_per_pack: 1094.04, storage_period: "6 мес.", technology: "RD", available_units: 10 },
-    { id: 212, category_id: 12, subcategory_id: 1201, name: "Чизкейк «Шоколадный» (творожное суфле)", article: "919219", weight: 100, price_per_unit: 87.50, units_per_pack: 12, price_per_pack: 1050.00, storage_period: "6 мес.", technology: "RD", available_units: 12 },
-    { id: 213, category_id: 12, subcategory_id: 1201, name: "Чизкейк «Фисташковый» (творожное суфле)", article: "919217", weight: 100, price_per_unit: 87.50, units_per_pack: 12, price_per_pack: 1050.00, storage_period: "6 мес.", technology: "RD", available_units: 15 },
-    { id: 214, category_id: 12, subcategory_id: 1201, name: "Чизкейк «New York» с клубникой (творожное суфле)", article: "919216", weight: 100, price_per_unit: 77.08, units_per_pack: 12, price_per_pack: 924.96, storage_period: "6 мес.", technology: "RD", available_units: 18 },
-    { id: 215, category_id: 12, subcategory_id: 1201, name: "Чизкейк «New York» (творожное суфле)", article: "919215", weight: 100, price_per_unit: 77.08, units_per_pack: 12, price_per_pack: 924.96, storage_period: "6 мес.", technology: "RD", available_units: 10 },
-    { id: 216, category_id: 12, subcategory_id: 1201, name: "Чизкейк «New York» (Гурманов)", article: "917601", weight: 125, price_per_unit: 115.30, units_per_pack: 16, price_per_pack: 1844.80, storage_period: "6 мес.", technology: "RD", available_units: 12 },
-    { id: 217, category_id: 12, subcategory_id: 1201, name: "Чизкейки круглые «Ассорти» 4 вкуса: вишня, карамель, классический, манго-маракуйя (⌀ 7 см)", article: "911426", weight: 120, price_per_unit: 101.19, units_per_pack: 16, price_per_pack: 1619.04, storage_period: "6 мес.", technology: "RD", available_units: 15 },
-    { id: 218, category_id: 12, subcategory_id: 1201, name: "Чизкейк «Ассорти» 8 вкусов: шоколад, карамель, вишня, Нью-Йорк, клубника, фисташка и малина, тропический с манго и чиа, кокос", article: "917610", weight: 125, price_per_unit: 150.90, units_per_pack: 16, price_per_pack: 2414.40, storage_period: "6 мес.", technology: "RD", available_units: 18 },
-
-    // Пироги (тарты) порционные - Кондитерские изделия
-    { id: 219, category_id: 12, subcategory_id: 1202, name: "Пирог «Лимонный»", article: "919220", weight: 100, price_per_unit: 96.58, units_per_pack: 12, price_per_pack: 1158.96, storage_period: "6 мес.", technology: "RD", available_units: 10 },
-    { id: 220, category_id: 12, subcategory_id: 1202, name: "Пирог «Вишневый»", article: "919225", weight: 100, price_per_unit: 96.58, units_per_pack: 12, price_per_pack: 1158.96, storage_period: "6 мес.", technology: "RD", available_units: 12 },
-    { id: 221, category_id: 12, subcategory_id: 1202, name: "Пирог «Клубничный»", article: "919226", weight: 100, price_per_unit: 96.58, units_per_pack: 12, price_per_pack: 1158.96, storage_period: "6 мес.", technology: "RD", available_units: 15 },
-
-    // Порционные торты (готовые) (АКЦИЯ) - Кондитерские изделия
-    { id: 222, category_id: 12, subcategory_id: 1203, name: "Порционный торт «Медовик» (Чизберри)", article: "919222", weight: 116, price_per_unit: 106.25, units_per_pack: 12, price_per_pack: 1275.00, storage_period: "6 мес.", technology: "RD", available_units: 18 },
-    { id: 223, category_id: 12, subcategory_id: 1203, name: "Порционный торт «Медовик» (Эдельвейс)", article: "920053", weight: 140, price_per_unit: 110.50, units_per_pack: 12, price_per_pack: 1326.00, storage_period: "6 мес.", technology: "RD", available_units: 10 },
-    { id: 224, category_id: 12, subcategory_id: 1203, name: "Порционный торт «Наполеон» (120 гр.)", article: "918071", weight: 120, price_per_unit: 122.40, units_per_pack: 10, price_per_pack: 1224.00, storage_period: "6 мес.", technology: "RD", available_units: 12 },
-    { id: 225, category_id: 12, subcategory_id: 1203, name: "Порционный торт «Наполеон» (150 гр.)", article: "918065", weight: 150, price_per_unit: 142.60, units_per_pack: 9, price_per_pack: 1283.40, storage_period: "6 мес.", technology: "RD", available_units: 15 },
-    { id: 226, category_id: 12, subcategory_id: 1203, name: "Порционный торт «Красный бархат»", article: "920031", weight: 120, price_per_unit: 107.90, units_per_pack: 12, price_per_pack: 1294.80, storage_period: "6 мес.", technology: "RD", available_units: 18 },
-    { id: 227, category_id: 12, subcategory_id: 1203, name: "Порционный торт «Графские развалины»", article: "918066", weight: 100, price_per_unit: 135.80, units_per_pack: 12, price_per_pack: 1629.60, storage_period: "6 мес.", technology: "RD", available_units: 10 },
-    { id: 228, category_id: 12, subcategory_id: 1203, name: "Порционный торт «Рикотта с грушей»", article: "919051", weight: 108, price_per_unit: 135.90, units_per_pack: 12, price_per_pack: 1630.80, storage_period: "6 мес.", technology: "RD", available_units: 12 },
-    { id: 229, category_id: 12, subcategory_id: 1203, name: "Порционный торт «Захер»", article: "920054", weight: 110, price_per_unit: 113.50, units_per_pack: 12, price_per_pack: 1362.00, storage_period: "6 мес.", technology: "RD", available_units: 15 },
-    { id: 230, category_id: 12, subcategory_id: 1203, name: "Порционный торт «Морковный»", article: "920061", weight: 100, price_per_unit: 104.90, units_per_pack: 12, price_per_pack: 1258.80, storage_period: "6 мес.", technology: "RD", available_units: 18 },
-    { id: 231, category_id: 12, subcategory_id: 1203, name: "Порционный муссовый торт «Три шоколада»", article: "920033", weight: 100, price_per_unit: 153.10, units_per_pack: 12, price_per_pack: 1837.20, storage_period: "6 мес.", technology: "RD", available_units: 10 },
-    { id: 232, category_id: 12, subcategory_id: 1203, name: "Порционный бисквитный торт «Три шоколада»", article: "920055", weight: 100, price_per_unit: 141.00, units_per_pack: 12, price_per_pack: 1692.00, storage_period: "6 мес.", technology: "RD", available_units: 12 },
-    { id: 233, category_id: 12, subcategory_id: 1203, name: "Порционный торт «Прага»", article: "919272", weight: 114, price_per_unit: 106.90, units_per_pack: 14, price_per_pack: 1496.60, storage_period: "6 мес.", technology: "RD", available_units: 15 },
-    { id: 234, category_id: 12, subcategory_id: 1203, name: "Порционный торт «Тирамису»", article: "919271", weight: 114, price_per_unit: 114.90, units_per_pack: 14, price_per_pack: 1608.60, storage_period: "6 мес.", technology: "RD", available_units: 18 },
-    { id: 235, category_id: 12, subcategory_id: 1203, name: "Торт «Брусничный» с белым шоколадом (ДФ)", article: "918041", weight: 125, price_per_unit: 161.33, units_per_pack: 12, price_per_pack: 1935.96, storage_period: "6 мес.", technology: "RD", available_units: 10 },
-
-    // Пирожные (готовые) - Кондитерские изделия
-    { id: 236, category_id: 12, subcategory_id: 1204, name: "Пирожное «Картошка с клубникой» (3 шт в коррексе)", article: "912220", weight: 50, price_per_unit: 38.30, units_per_pack: 72, price_per_pack: 2757.60, storage_period: "6 мес.", technology: "RD", available_units: 12 },
-    { id: 237, category_id: 12, subcategory_id: 1204, name: "Пирожное «Картошка» (60 гр.)", article: "919410", weight: 60, price_per_unit: 42.00, units_per_pack: 31, price_per_pack: 1302.00, storage_period: "6 мес.", technology: "RD", available_units: 15 },
-    { id: 238, category_id: 12, subcategory_id: 1204, name: "Пирожное «Картошка» (70 гр.)", article: "912207", weight: 70, price_per_unit: 37.00, units_per_pack: 96, price_per_pack: 3552.00, storage_period: "6 мес.", technology: "RD", available_units: 18 },
-    { id: 239, category_id: 12, subcategory_id: 1204, name: "Пирожные «Малина-Фисташка» в креманке", article: "918136", weight: 90, price_per_unit: 120.50, units_per_pack: 12, price_per_pack: 1446.00, storage_period: "6 мес.", technology: "RD", available_units: 10 },
-    { id: 240, category_id: 12, subcategory_id: 1204, name: "Пирожные «Манго-маракуйя» в креманке", article: "918110", weight: 90, price_per_unit: 120.50, units_per_pack: 12, price_per_pack: 1446.00, storage_period: "6 мес.", technology: "RD", available_units: 12 },
-    { id: 241, category_id: 12, subcategory_id: 1204, name: "Пирожные «Тирамису» в креманке", article: "918097", weight: 90, price_per_unit: 120.50, units_per_pack: 12, price_per_pack: 1446.00, storage_period: "6 мес.", technology: "RD", available_units: 15 },
-    { id: 242, category_id: 12, subcategory_id: 1204, name: "Кольцо с творожным кремом", article: "912213", weight: 50, price_per_unit: 40.70, units_per_pack: 36, price_per_pack: 1465.20, storage_period: "6 мес.", technology: "RD", available_units: 18 },
-
-    // Эклеры «Премиум» (готовые) - Кондитерские изделия
-    { id: 243, category_id: 12, subcategory_id: 1205, name: "Эклер Премиум «Шоколадный»", article: "912224", weight: 50, price_per_unit: 104.50, units_per_pack: 10, price_per_pack: 1045.00, storage_period: "6 мес.", technology: "RD", available_units: 10 },
-    { id: 244, category_id: 12, subcategory_id: 1205, name: "Эклер Премиум «Смородиновый»", article: "912225", weight: 50, price_per_unit: 104.50, units_per_pack: 10, price_per_pack: 1045.00, storage_period: "6 мес.", technology: "RD", available_units: 12 },
-    { id: 245, category_id: 12, subcategory_id: 1205, name: "Эклер Премиум «Манго»", article: "912226", weight: 50, price_per_unit: 104.50, units_per_pack: 10, price_per_pack: 1045.00, storage_period: "6 мес.", technology: "RD", available_units: 15 },
-    { id: 246, category_id: 12, subcategory_id: 1205, name: "Эклер Премиум «Вишневый»", article: "912227", weight: 50, price_per_unit: 104.50, units_per_pack: 10, price_per_pack: 1045.00, storage_period: "6 мес.", technology: "RD", available_units: 18 },
-    { id: 247, category_id: 12, subcategory_id: 1205, name: "Эклер Премиум «Карамельный»", article: "912228", weight: 50, price_per_unit: 104.50, units_per_pack: 10, price_per_pack: 1045.00, storage_period: "6 мес.", technology: "RD", available_units: 10 },
-    { id: 248, category_id: 12, subcategory_id: 1205, name: "Эклер Премиум «Ванильный»", article: "912229", weight: 50, price_per_unit: 104.50, units_per_pack: 10, price_per_pack: 1045.00, storage_period: "6 мес.", technology: "RD", available_units: 12 },
-
-    // Эклеры классические (готовые) - Кондитерские изделия
-    { id: 249, category_id: 12, subcategory_id: 1206, name: "Эклер с фисташковым заварным кремом и малиной", article: "918131", weight: 47, price_per_unit: 48.30, units_per_pack: 40, price_per_pack: 1932.00, storage_period: "6 мес.", technology: "RD", available_units: 15 },
-    { id: 250, category_id: 12, subcategory_id: 1206, name: "Эклер «Груша-карамель»", article: "918138", weight: 47, price_per_unit: 42.90, units_per_pack: 40, price_per_pack: 1716.00, storage_period: "6 мес.", technology: "RD", available_units: 18 },
-    { id: 251, category_id: 12, subcategory_id: 1206, name: "Эклер «Рафаэлло»", article: "912243", weight: 60, price_per_unit: 76.70, units_per_pack: 12, price_per_pack: 920.40, storage_period: "6 мес.", technology: "RD", available_units: 10 },
-    { id: 252, category_id: 12, subcategory_id: 1206, name: "Эклер с сырным кремом", article: "912244", weight: 60, price_per_unit: 76.70, units_per_pack: 12, price_per_pack: 920.40, storage_period: "6 мес.", technology: "RD", available_units: 12 },
-    { id: 253, category_id: 12, subcategory_id: 1206, name: "Эклер «Шоколадный»", article: "912245", weight: 60, price_per_unit: 76.70, units_per_pack: 12, price_per_pack: 920.40, storage_period: "6 мес.", technology: "RD", available_units: 15 },
-    { id: 254, category_id: 12, subcategory_id: 1206, name: "Эклер «Ванильный» (Сладо)", article: "918132", weight: 60, price_per_unit: 74.60, units_per_pack: 10, price_per_pack: 746.00, storage_period: "6 мес.", technology: "RD", available_units: 18 },
-    { id: 255, category_id: 12, subcategory_id: 1206, name: "Эклер «Ванильный» (Бута)", article: "912239", weight: 60, price_per_unit: 68.30, units_per_pack: 12, price_per_pack: 819.60, storage_period: "6 мес.", technology: "RD", available_units: 10 },
-    { id: 256, category_id: 12, subcategory_id: 1206, name: "Эклер «Кокосовый»", article: "918133", weight: 60, price_per_unit: 71.50, units_per_pack: 10, price_per_pack: 715.00, storage_period: "6 мес.", technology: "RD", available_units: 12 },
-    { id: 257, category_id: 12, subcategory_id: 1206, name: "Эклер «Лимонный»", article: "918134", weight: 60, price_per_unit: 82.20, units_per_pack: 10, price_per_pack: 822.00, storage_period: "6 мес.", technology: "RD", available_units: 15 },
-    { id: 258, category_id: 12, subcategory_id: 1206, name: "Эклер заварной «Шоколадный»", article: "920076", weight: 60, price_per_unit: 82.50, units_per_pack: 10, price_per_pack: 825.00, storage_period: "6 мес.", technology: "RD", available_units: 18 },
-    { id: 259, category_id: 12, subcategory_id: 1206, name: "Эклер заварной «Ванильный»", article: "920074", weight: 60, price_per_unit: 87.00, units_per_pack: 10, price_per_pack: 870.00, storage_period: "6 мес.", technology: "RD", available_units: 10 },
-    { id: 260, category_id: 12, subcategory_id: 1206, name: "Эклер заварной «Глазированный»", article: "920075", weight: 60, price_per_unit: 102.00, units_per_pack: 10, price_per_pack: 1020.00, storage_period: "6 мес.", technology: "RD", available_units: 12 },
-    { id: 261, category_id: 12, subcategory_id: 1206, name: "Эклер обсыпной с вареной сгущенкой (Бута)", article: "912242", weight: 60, price_per_unit: 73.50, units_per_pack: 12, price_per_pack: 882.00, storage_period: "6 мес.", technology: "RD", available_units: 15 },
-    { id: 262, category_id: 12, subcategory_id: 1206, name: "Эклер с кремом из сгущёнки и ореховой обсыпкой (Эдельвейс)", article: "920064", weight: 60, price_per_unit: 72.00, units_per_pack: 10, price_per_pack: 720.00, storage_period: "6 мес.", technology: "RD", available_units: 18 },
-    { id: 263, category_id: 12, subcategory_id: 1206, name: "Эклер с заварным кремом", article: "918061", weight: 50, price_per_unit: 41.60, units_per_pack: 50, price_per_pack: 2080.00, storage_period: "6 мес.", technology: "RD", available_units: 10 },
-
-    // Вафельные трубочки (готовые) - Кондитерские изделия
-    { id: 264, category_id: 12, subcategory_id: 1207, name: "Трубочка с варёной сгущенкой", article: "918121", weight: 70, price_per_unit: 40.50, units_per_pack: 20, price_per_pack: 810.00, storage_period: "6 мес.", technology: "RD", available_units: 12 },
-    { id: 265, category_id: 12, subcategory_id: 1207, name: "Трубочка с варёной сгущенкой «Премиум»", article: "918090", weight: 75, price_per_unit: 63.30, units_per_pack: 30, price_per_pack: 1899.00, storage_period: "6 мес.", technology: "RD", available_units: 15 },
-
-    // Багеты (требуют допекания в печи) - Хлеб и булочки
-    { id: 266, category_id: 13, subcategory_id: 1208, name: "Багет французский чесночный, 32 см", article: "601028", weight: 200, price_per_unit: 45.73, units_per_pack: 15, price_per_pack: 685.95, storage_period: "3 мес.", technology: "PBK", available_units: 10 },
-    { id: 267, category_id: 13, subcategory_id: 1208, name: "Багет французский классический, 32 см", article: "601003", weight: 200, price_per_unit: 37.13, units_per_pack: 15, price_per_pack: 556.95, storage_period: "3 мес.", technology: "PBK", available_units: 12 },
-
-    // Чиабатты (требуют допекания в печи) - Хлеб и булочки
-    { id: 268, category_id: 13, subcategory_id: 1209, name: "Миничиабатта", article: "911434", weight: 100, price_per_unit: 35.96, units_per_pack: 25, price_per_pack: 899.00, storage_period: "3 мес.", technology: "PBK", available_units: 15 },
-    { id: 269, category_id: 13, subcategory_id: 1209, name: "Миничиабатта темная", article: "911435", weight: 100, price_per_unit: 35.96, units_per_pack: 25, price_per_pack: 899.00, storage_period: "3 мес.", technology: "PBK", available_units: 18 },
-    { id: 270, category_id: 13, subcategory_id: 1209, name: "Чиабатта", article: "911436", weight: 230, price_per_unit: 58.20, units_per_pack: 20, price_per_pack: 1164.00, storage_period: "3 мес.", technology: "PBK", available_units: 10 },
-    { id: 271, category_id: 13, subcategory_id: 1209, name: "Чиабатта темная", article: "911437", weight: 230, price_per_unit: 58.20, units_per_pack: 20, price_per_pack: 1164.00, storage_period: "3 мес.", technology: "PBK", available_units: 12 },
-
-    // Булочки для сэндвичей - Хлеб и булочки
-    { id: 272, category_id: 13, subcategory_id: 1210, name: "Хлеб для сэндвича Пшеничный", article: "601001", weight: 185, price_per_unit: 27.64, units_per_pack: 50, price_per_pack: 1382.00, storage_period: "3 мес.", technology: "RST+", available_units: 15 },
-    { id: 273, category_id: 13, subcategory_id: 1210, name: "Хлеб для сэндвича Солодовый", article: "601002", weight: 185, price_per_unit: 29.00, units_per_pack: 50, price_per_pack: 1450.00, storage_period: "3 мес.", technology: "RST+", available_units: 18 }
-    ];
     // Breadcrumbs component
     function Breadcrumbs({ path, onNavigate }) {
       return (
@@ -555,7 +36,7 @@
               {index > 0 && <span className="mx-2">/</span>}
               <button 
                 onClick={() => onNavigate(item.screen, item.id)}
-                className={`${index === path.length - 1 ? 'font-bold text-orange-500' : 'hover:text-orange-400'}`}
+                className={`${index === path.length - 1 ? 'font-bold text-primary-accent' : 'hover:text-primary-accent'}`}
               >
                 {item.name}
               </button>
@@ -565,16 +46,75 @@
       );
     }
 
+    // Header component
+    function Header({ cart, onNavigate }) {
+      return (
+        <header className="bg-white shadow-md p-4 flex justify-between items-center">
+          <div>
+            <img src="https://pastrichi.ru/local/templates/redesign_2024/assets/images/main/logo.svg" alt="Sdoba Zakax Logo" className="h-10" />
+          </div>
+          <div className="flex space-x-4">
+            <button
+              onClick={() => onNavigate("cart")}
+              className="text-secondary-accent hover:text-primary-accent"
+              style={{display: 'flex'}}
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              <span className="ml-1">({cart.length})</span>
+            </button>
+            <button
+              onClick={() => onNavigate("history")}
+              className="text-secondary-accent hover:text-primary-accent"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+              </svg>
+            </button>
+          </div>
+        </header>
+      );
+    }
+
     // Main App Component
     function App() {
-      const [screen, setScreen] = useState("main");
+      const [screen, setScreen] = useState("catalog");
+      const [categories, setCategories] = useState([]);
       const [selectedCategory, setSelectedCategory] = useState(null);
       const [selectedSubcategory, setSelectedSubcategory] = useState(null);
-      const [selectedProduct, setSelectedProduct] = useState(null);
+      const [products, setProducts] = useState([]);
       const [cart, setCart] = useState([]);
       const [checkoutData, setCheckoutData] = useState({ name: "", phone: "", address: "" });
       const [orders, setOrders] = useState([]);
-      const [breadcrumbs, setBreadcrumbs] = useState([{ name: "Главная", screen: "main" }]);
+      const [breadcrumbs, setBreadcrumbs] = useState([{ name: "Каталог", screen: "catalog" }]);
+
+      const userId = Telegram.WebApp.initDataUnsafe.user?.id || 1;
+
+      // Fetch categories on mount
+      useEffect(() => {
+        axios.get(`${API_BASE_URL}/categories`)
+          .then(response => setCategories(response.data))
+          .catch(error => console.error("Error fetching categories:", error));
+      }, []);
+
+      // Fetch cart on mount and screen change
+      useEffect(() => {
+        if (screen === "cart") {
+          axios.get(`${API_BASE_URL}/cart`)
+            .then(response => setCart(response.data))
+            .catch(error => console.error("Error fetching cart:", error));
+        }
+      }, [screen]);
+
+      // Fetch orders on history screen
+      useEffect(() => {
+        if (screen === "history") {
+          axios.get(`${API_BASE_URL}/orders`)
+            .then(response => setOrders(response.data))
+            .catch(error => console.error("Error fetching orders:", error));
+        }
+      }, [screen]);
 
       const updateBreadcrumbs = (newScreen, id = null) => {
         let newBreadcrumbs = [...breadcrumbs];
@@ -582,41 +122,32 @@
         if (newScreen === "main") {
           newBreadcrumbs = [{ name: "Главная", screen: "main" }];
         } else if (newScreen === "catalog") {
-          newBreadcrumbs = [
-            { name: "Главная", screen: "main" },
-            { name: "Каталог", screen: "catalog" }
-          ];
+          newBreadcrumbs = [{ name: "Каталог", screen: "catalog" }];
         } else if (newScreen === "subcategories") {
           newBreadcrumbs = [
-            { name: "Главная", screen: "main" },
             { name: "Каталог", screen: "catalog" },
             { name: selectedCategory.name, screen: "subcategories", id: selectedCategory.id }
           ];
         } else if (newScreen === "products") {
-          const subcategory = mockCategories
-            .flatMap(c => c.subcategories)
-            .find(s => s.id === id);
-            
           newBreadcrumbs = [
-            { name: "Главная", screen: "main" },
             { name: "Каталог", screen: "catalog" },
             { name: selectedCategory.name, screen: "subcategories", id: selectedCategory.id },
-            { name: subcategory.name, screen: "products", id: subcategory.id }
+            { name: selectedSubcategory.name, screen: "products", id: selectedSubcategory.id }
           ];
         } else if (newScreen === "cart") {
           newBreadcrumbs = [
-            { name: "Главная", screen: "main" },
+            { name: "Каталог", screen: "catalog" },
             { name: "Корзина", screen: "cart" }
           ];
         } else if (newScreen === "checkout") {
           newBreadcrumbs = [
-            { name: "Главная", screen: "main" },
+            { name: "Каталог", screen: "catalog" },
             { name: "Корзина", screen: "cart" },
             { name: "Оформление", screen: "checkout" }
           ];
         } else if (newScreen === "history") {
           newBreadcrumbs = [
-            { name: "Главная", screen: "main" },
+            { name: "Каталог", screen: "catalog" },
             { name: "История заказов", screen: "history" }
           ];
         }
@@ -627,76 +158,102 @@
       const navigateTo = (screen, id = null) => {
         setScreen(screen);
         if (screen === "subcategories") {
-          const category = mockCategories.find(c => c.id === id);
+          const category = categories.find(c => c.id === id);
           setSelectedCategory(category);
         } else if (screen === "products") {
-          const subcategory = mockCategories
+          const subcategory = categories
             .flatMap(c => c.subcategories)
             .find(s => s.id === id);
           setSelectedSubcategory(subcategory);
+          // Fetch products for subcategory
+          axios.get(`${API_BASE_URL}/products/${id}`)
+            .then(response => setProducts(response.data))
+            .catch(error => console.error("Error fetching products:", error));
         }
         updateBreadcrumbs(screen, id);
       };
 
       useEffect(() => {
-        // Initialize Telegram Web App
         Telegram.WebApp.ready();
         Telegram.WebApp.expand();
 
-        // Set up MainButton based on screen
         Telegram.WebApp.MainButton.hide();
         if (screen === "cart" && cart.length > 0) {
           Telegram.WebApp.MainButton.setText("Оформить заказ");
           Telegram.WebApp.MainButton.show();
           Telegram.WebApp.MainButton.onClick(() => navigateTo("checkout"));
-        } else if (screen === "checkout") {
-          Telegram.WebApp.MainButton.setText("Отправить заказ");
-          Telegram.WebApp.MainButton.show();
-          Telegram.WebApp.MainButton.onClick(handleCheckout);
         }
       }, [screen, cart]);
 
-      const handleAddToCart = (product, isPack = false, quantity = 1) => {
-        setCart([...cart, { ...product, isPack, quantity }]);
-        Telegram.WebApp.showAlert(`Добавлено: ${product.name} (${isPack ? "упаковка" : "поштучно"})`);
+      const handleAddToCart = async (product, isPack = false, quantity = 1) => {
+        try {
+          await axios.post(`${API_BASE_URL}/cart/add`, {
+            product_id: product.id,
+            quantity,
+            is_pack: isPack
+          });
+          const response = await axios.get(`${API_BASE_URL}/cart`);
+          setCart(response.data);
+          Telegram.WebApp.showAlert(`Добавлено: ${product.name} (${isPack ? "упаковка" : "поштучно"})`);
+        } catch (error) {
+          Telegram.WebApp.showAlert("Ошибка при добавлении в корзину");
+        }
       };
 
-      const handleCheckout = () => {
+      const handleCheckout = async () => {
         if (!checkoutData.name || !checkoutData.phone || !checkoutData.address) {
           Telegram.WebApp.showAlert("Пожалуйста, заполните все поля.");
           return;
         }
-        const order = {
-          id: orders.length + 1,
-          user_id: Telegram.WebApp.initDataUnsafe.user?.id || 1,
-          total_price: cart.reduce((sum, item) => sum + (item.isPack ? item.price_per_pack : item.price_per_unit) * item.quantity, 0),
-          items: cart,
-          created_at: new Date().toISOString(),
-        };
-        setOrders([...orders, order]);
-        setCart([]);
-        setCheckoutData({ name: "", phone: "", address: "" });
-        Telegram.WebApp.showAlert("Заказ успешно отправлен!");
-        navigateTo("main");
+        try {
+          const response = await axios.post(`${API_BASE_URL}/orders`, {
+            user_id: userId,
+            name: checkoutData.name,
+            phone: checkoutData.phone,
+            address: checkoutData.address,
+            items: cart.map(item => ({
+              product_id: item.product_id,
+              quantity: item.quantity,
+              is_pack: item.is_pack
+            }))
+          });
+          setCart([]);
+          setCheckoutData({ name: "", phone: "", address: "" });
+          Telegram.WebApp.showAlert("Заказ успешно отправлен!");
+          navigateTo("catalog");
+        } catch (error) {
+          Telegram.WebApp.showAlert("Ошибка при оформлении заказа");
+          console.error("Checkout error:", error);
+        }
+      };
+
+      const handleClearCart = async () => {
+        try {
+          await axios.delete(`${API_BASE_URL}/cart/clear`);
+          setCart([]);
+          Telegram.WebApp.showAlert("Корзина очищена");
+        } catch (error) {
+          Telegram.WebApp.showAlert("Ошибка при очистке корзины");
+        }
       };
 
       const renderMainMenu = () => (
         <div className="p-4">
-          <h1 className="text-2xl font-bold mb-6 text-center text-orange-600">Добро пожаловать в Sdoba Zakax!</h1>
+          <h1 className="text-2xl font-bold mb-6 text-center text-primary-accent">Добро пожаловать в Sdoba Zakax!</h1>
           <button 
-            className="w-full bg-orange-100 text-orange-800 p-4 mb-4 rounded-2xl shadow-md hover:bg-orange-200 transition-colors"
+            className="w-full bg-primary-accent text-white p-4 mb-4 rounded-2xl shadow-md hover:bg-primary-accent transition-colors"
             onClick={() => navigateTo("catalog")}
           >
             Каталог
           </button>
           <button 
-            className="w-full bg-orange-100 text-orange-800 p-4 mb-4 rounded-2xl shadow-md hover:bg-orange-200 transition-colors"
+            className="w-full bg-primary-accent text-white p-4 mb-4 rounded-2xl shadow-md hover:bg-primary-accent transition-colors"
             onClick={() => navigateTo("cart")}
           >
             Корзина ({cart.length})
           </button>
           <button 
-            className="w-full bg-orange-100 text-orange-800 p-4 rounded-2xl shadow-md hover:bg-orange-200 transition-colors"
+            className="w-full bg-primary-accent text-white p-4 rounded-2xl shadow-md hover:bg-primary-accent transition-colors"
             onClick={() => navigateTo("history")}
           >
             История заказов
@@ -707,9 +264,9 @@
       const renderCatalog = () => (
         <div className="p-4">
           <Breadcrumbs path={breadcrumbs} onNavigate={navigateTo} />
-          <h2 className="text-xl font-bold mb-4 text-orange-600">Категории</h2>
+          <h2 className="text-xl font-bold mb-4 text-primary-accent">Категории</h2>
           <div className="grid grid-cols-2 gap-4">
-            {mockCategories.map(category => (
+            {categories.map(category => (
               <button
                 key={category.id}
                 className="bg-white p-0 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow"
@@ -717,7 +274,7 @@
               >
                 <img src={category.image} alt={category.name} className="w-full h-32 object-cover" />
                 <div className="p-2">
-                  <h3 className="font-medium text-center">{category.name}</h3>
+                  <h3 className="font-medium text-center text-secondary-accent">{category.name}</h3>
                 </div>
               </button>
             ))}
@@ -728,16 +285,16 @@
       const renderSubcategories = () => (
         <div className="p-4">
           <Breadcrumbs path={breadcrumbs} onNavigate={navigateTo} />
-          <h2 className="text-xl font-bold mb-4 text-orange-600">{selectedCategory.name}</h2>
+          <h2 className="text-xl font-bold mb-4 text-primary-accent">{selectedCategory?.name}</h2>
           <div className="space-y-4">
-            {selectedCategory.subcategories.map(subcategory => (
+            {selectedCategory?.subcategories.map(subcategory => (
               <div key={subcategory.id} className="bg-white rounded-xl shadow-md overflow-hidden">
                 <button
                   className="w-full text-left p-4 hover:bg-gray-50"
                   onClick={() => navigateTo("products", subcategory.id)}
                 >
                   <div className="flex justify-between items-center">
-                    <h3 className="font-medium">{subcategory.name}</h3>
+                    <h3 className="font-medium text-secondary-accent">{subcategory.name}</h3>
                     <span className="text-sm text-gray-500">{subcategory.storage_period}</span>
                   </div>
                 </button>
@@ -747,75 +304,48 @@
         </div>
       );
 
-      const renderProducts = () => {
-        const productsInSubcategory = mockProducts.filter(
-          product => product.subcategory_id === selectedSubcategory.id
-        );
-        
-        return (
-          <div className="p-4">
-            <Breadcrumbs path={breadcrumbs} onNavigate={navigateTo} />
-            <h2 className="text-xl font-bold mb-4 text-orange-600">{selectedSubcategory.name}</h2>
-            <p className="text-sm text-gray-500 mb-4">Срок хранения: {selectedSubcategory.storage_period}</p>
-            
-            <div className="bg-white rounded-xl shadow-md overflow-hidden">
-              <table className="w-full">
-                <thead className="bg-gray-50">
-                  <tr className="text-left text-sm text-gray-500">
-                    <th className="p-3">Наименование</th>
-                    <th className="p-3">Вес</th>
-                    <th className="p-3">Кол-во</th>
-                    <th className="p-3">Цена</th>
-                    <th className="p-3">Действия</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {productsInSubcategory.map(product => (
-                    <tr key={product.id} className="border-t hover:bg-gray-50">
-                      <td className="p-3">
-                        <div className="font-medium">{product.name}</div>
-                        <div className="text-xs text-gray-500">{product.article}</div>
-                      </td>
-                      <td className="p-3">{product.weight} г</td>
-                      <td className="p-3">{product.units_per_pack} шт.</td>
-                      <td className="p-3">
-                        <div className="font-bold text-orange-600">{product.price_per_unit}₽</div>
-                        <div className="text-xs text-gray-500">{product.price_per_pack}₽/уп.</div>
-                      </td>
-                      <td className="p-3">
-                        <div className="flex space-x-2">
-                          <button
-                            className="bg-orange-100 text-orange-800 p-1 rounded text-xs hover:bg-orange-200"
-                            onClick={() => handleAddToCart(product, false)}
-                          >
-                            Шт.
-                          </button>
-                          <button
-                            className="bg-orange-100 text-orange-800 p-1 rounded text-xs hover:bg-orange-200"
-                            onClick={() => handleAddToCart(product, true)}
-                          >
-                            Уп.
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+      const renderProducts = () => (
+        <div className="p-4">
+          <Breadcrumbs path={breadcrumbs} onNavigate={navigateTo} />
+          <h2 className="text-xl font-bold mb-4 text-primary-accent">{selectedSubcategory?.name}</h2>
+          <p className="text-sm text-gray-500 mb-4">Срок хранения: {selectedSubcategory?.storage_period}</p>
+          <div className="grid grid-cols-2 gap-4">
+            {products.map(product => (
+              <div key={product.id} className="bg-white rounded-xl shadow-md p-4">
+                <h3 className="font-medium text-secondary-accent mb-2">{product.name}</h3>
+                <p className="text-sm text-gray-600">Вес: {product.weight} г</p>
+                <p className="text-sm text-gray-600">В коробке: {product.units_per_pack} шт.</p>
+                <p className="text-primary-accent font-bold mt-2">{product.price_per_unit}₽/шт.</p>
+                <p className="text-gray-500 text-sm">{product.price_per_pack}₽/уп.</p>
+                <div className="flex space-x-2 mt-3">
+                  <button
+                    className="bg-primary-accent text-white px-3 py-1 rounded-md text-sm hover:bg-primary-accent"
+                    onClick={() => handleAddToCart(product, false)}
+                  >
+                    Заказать шт.
+                  </button>
+                  <button
+                    className="bg-secondary-accent text-white px-3 py-1 rounded-md text-sm hover:bg-secondary-accent"
+                    onClick={() => handleAddToCart(product, true)}
+                  >
+                    Заказать уп.
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
-        );
-      };
+        </div>
+      );
 
       const renderCart = () => (
         <div className="p-4">
           <Breadcrumbs path={breadcrumbs} onNavigate={navigateTo} />
-          <h2 className="text-xl font-bold mb-4 text-orange-600">Корзина</h2>
+          <h2 className="text-xl font-bold mb-4 text-primary-accent">Корзина</h2>
           {cart.length === 0 ? (
             <div className="bg-white p-6 rounded-xl shadow-md text-center">
               <p>Ваша корзина пуста.</p>
               <button 
-                className="mt-4 bg-orange-100 text-orange-800 p-3 rounded-xl shadow-md hover:bg-orange-200 transition-colors"
+                className="mt-4 bg-primary-accent text-white p-3 rounded-xl shadow-md hover:bg-primary-accent transition-colors"
                 onClick={() => navigateTo("catalog")}
               >
                 Перейти в каталог
@@ -828,9 +358,9 @@
                   <div key={index} className="p-4 border-b last:border-b-0">
                     <div className="flex items-start">
                       <div className="flex-1">
-                        <h3 className="font-medium">{item.name}</h3>
-                        <p className="text-sm text-gray-600">{item.quantity} {item.isPack ? "упаковок" : "шт."}</p>
-                        <p className="text-orange-600 font-bold">{(item.isPack ? item.price_per_pack : item.price_per_unit) * item.quantity}₽</p>
+                        <h3 className="font-medium text-secondary-accent">{item.name}</h3>
+                        <p className="text-sm text-gray-600">{item.quantity} {item.is_pack ? "упаковок" : "шт."}</p>
+                        <p className="text-primary-accent font-bold">{(item.is_pack ? item.price_per_pack : item.price_per_unit) * item.quantity}₽</p>
                       </div>
                     </div>
                   </div>
@@ -838,12 +368,19 @@
               </div>
               
               <div className="bg-white p-4 rounded-xl shadow-md mb-4">
-                <p className="font-bold text-lg text-right">Итого: {cart.reduce((sum, item) => sum + (item.isPack ? item.price_per_pack : item.price_per_unit) * item.quantity, 0)}₽</p>
+                <p className="font-bold text-lg text-right text-primary-accent">Итого: {cart.reduce((sum, item) => sum + (item.is_pack ? item.price_per_pack : item.price_per_unit) * item.quantity, 0)}₽</p>
               </div>
               
               <button 
-                className="w-full bg-red-100 text-red-800 p-3 rounded-xl shadow-md hover:bg-red-200 transition-colors mb-4"
-                onClick={() => setCart([])}
+                className="w-full bg-primary-accent text-white p-3 rounded-xl shadow-md hover:bg-primary-accent transition-colors mb-4"
+                onClick={() => navigateTo("checkout")}
+              >
+                Оформить заказ
+              </button>
+              
+              <button 
+                className="w-full bg-red-100 text-red-800 p-3 rounded-xl shadow-md hover:bg-red-200 transition-colors"
+                onClick={handleClearCart}
               >
                 Очистить корзину
               </button>
@@ -855,38 +392,44 @@
       const renderCheckout = () => (
         <div className="p-4">
           <Breadcrumbs path={breadcrumbs} onNavigate={navigateTo} />
-          <h2 className="text-xl font-bold mb-4 text-orange-600">Оформление заказа</h2>
+          <h2 className="text-xl font-bold mb-4 text-primary-accent">Оформление заказа</h2>
           <div className="bg-white p-4 rounded-xl shadow-md">
             <div className="mb-4">
-              <label className="block text-gray-700 mb-1">Имя</label>
+              <label className="block text-secondary-accent mb-1">Имя</label>
               <input
                 type="text"
                 placeholder="Ваше имя"
-                className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-200"
+                className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-accent"
                 value={checkoutData.name}
                 onChange={e => setCheckoutData({ ...checkoutData, name: e.target.value })}
               />
             </div>
             <div className="mb-4">
-              <label className="block text-gray-700 mb-1">Телефон</label>
+              <label className="block text-secondary-accent mb-1">Телефон</label>
               <input
                 type="tel"
                 placeholder="Ваш телефон"
-                className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-200"
+                className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-accent"
                 value={checkoutData.phone}
                 onChange={e => setCheckoutData({ ...checkoutData, phone: e.target.value })}
               />
             </div>
             <div className="mb-4">
-              <label className="block text-gray-700 mb-1">Адрес</label>
+              <label className="block text-secondary-accent mb-1">Адрес</label>
               <input
                 type="text"
                 placeholder="Адрес доставки"
-                className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-200"
+                className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-accent"
                 value={checkoutData.address}
                 onChange={e => setCheckoutData({ ...checkoutData, address: e.target.value })}
               />
             </div>
+            <button 
+              className="w-full bg-primary-accent text-white p-3 rounded-xl shadow-md hover:bg-primary-accent transition-colors"
+              onClick={handleCheckout}
+            >
+              Отправить
+            </button>
           </div>
         </div>
       );
@@ -894,12 +437,12 @@
       const renderHistory = () => (
         <div className="p-4">
           <Breadcrumbs path={breadcrumbs} onNavigate={navigateTo} />
-          <h2 className="text-xl font-bold mb-4 text-orange-600">История заказов</h2>
+          <h2 className="text-xl font-bold mb-4 text-primary-accent">История заказов</h2>
           {orders.length === 0 ? (
             <div className="bg-white p-6 rounded-xl shadow-md text-center">
               <p>У вас пока нет заказов.</p>
               <button 
-                className="mt-4 bg-orange-100 text-orange-800 p-3 rounded-xl shadow-md hover:bg-orange-200 transition-colors"
+                className="mt-4 bg-primary-accent text-white p-3 rounded-xl shadow-md hover:bg-primary-accent transition-colors"
                 onClick={() => navigateTo("catalog")}
               >
                 Перейти в каталог
@@ -911,8 +454,8 @@
                 <div key={order.id} className="bg-white rounded-xl shadow-md overflow-hidden">
                   <div className="p-4 border-b">
                     <div className="flex justify-between items-center">
-                      <h3 className="font-bold">Заказ #{order.id}</h3>
-                      <p className="text-orange-600 font-bold">{order.total_price}₽</p>
+                      <h3 className="font-bold text-secondary-accent">Заказ #{order.id}</h3>
+                      <p className="text-primary-accent font-bold">{order.total_price}₽</p>
                     </div>
                     <p className="text-sm text-gray-500">{new Date(order.created_at).toLocaleString()}</p>
                   </div>
@@ -920,10 +463,10 @@
                     {order.items.map((item, index) => (
                       <div key={index} className="flex items-center mb-3 last:mb-0">
                         <div className="flex-1">
-                          <p>{item.name}</p>
-                          <p className="text-sm text-gray-600">{item.quantity} {item.isPack ? "упаковок" : "шт."}</p>
+                          <p className="text-secondary-accent">{item.name}</p>
+                          <p className="text-sm text-gray-600">{item.quantity} {item.is_pack ? "упаковок" : "шт."}</p>
                         </div>
-                        <p className="text-orange-600">{(item.isPack ? item.price_per_pack : item.price_per_unit) * item.quantity}₽</p>
+                        <p className="text-primary-accent">{(item.is_pack ? item.price : item.price) * item.quantity}₽</p>
                       </div>
                     ))}
                   </div>
@@ -935,7 +478,8 @@
       );
 
       return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-white">
+          <Header cart={cart} onNavigate={navigateTo} />
           {screen === "main" && renderMainMenu()}
           {screen === "catalog" && renderCatalog()}
           {screen === "subcategories" && renderSubcategories()}
@@ -947,7 +491,6 @@
       );
     }
 
-    // Render the app
     ReactDOM.render(<App />, document.getElementById("root"));
   </script>
 </body>
